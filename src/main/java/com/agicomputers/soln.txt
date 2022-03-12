@@ -1,0 +1,8 @@
+Include your java directory as a vs code java source file
+download maven
+include JAVA_HOME as a in env
+include MAVEN_HOME in env
+include maven's bin directory
+include "java.home".in settings .json
+update pom file
+run mvn clean package -U
