@@ -22,10 +22,9 @@ public class Customer {
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL CONSTRAINT l_name_check CHECK(CHAR_LENGTH(customer_lname) > 1)")
     private String customerLname;
-
-    @Column(nullable=false)
+    
     @ManyToOne
-    @JoinColumn(name="role_id",referencedColumnName = "role.id")
+    @JoinColumn(name="role_id",referencedColumnName = "id")
     private Role role;
 
     @Column(nullable = false)
