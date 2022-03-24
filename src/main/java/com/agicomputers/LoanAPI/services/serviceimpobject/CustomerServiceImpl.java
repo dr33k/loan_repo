@@ -8,6 +8,7 @@ import com.agicomputers.LoanAPI.tools.generators.CustomerGenerator;
 import com.agicomputers.LoanAPI.tools.validators.CustomerValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,6 +17,8 @@ import java.util.*;
 public class CustomerServiceImpl implements CustomerService {
     @Autowired
     CustomerRepository customerRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Override
     public HashSet<CustomerDTO> getAllCustomers() {
@@ -65,7 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
         BeanUtils.copyProperties(cdtoReq,customer);
 
         customer.setCustomerId(CustomerGenerator.generateCustomerId(cdtoReq.getCustomerFname(),cdtoReq.getCustomerLname()));
-
+        customer.setCustomerPassphrase(passwordEncoder.encode(cdtoReq.getCustomerPassphrase()));
         customerRepository.save(customer);
         BeanUtils.copyProperties(customer,cdtoReq);
         return cdtoReq;
