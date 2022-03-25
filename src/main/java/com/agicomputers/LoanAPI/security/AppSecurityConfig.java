@@ -1,5 +1,6 @@
 package com.agicomputers.LoanAPI.security;
 
+import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +28,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/")
-                .permitAll()
+                .antMatchers("/").permitAll()
+                .antMatchers("/customer/**").hasRole(AppUserRole.CUSTOMER.name())
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -41,13 +42,13 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         UserDetails starB = User.builder()
                 .username("starButterfly")
                 .password(passwordEncoder.encode("ilovemarco"))
-                .roles("CUSTOMER")//ROLE_CUSTOMER
+                .roles(AppUserRole.CUSTOMER.name())//ROLE_CUSTOMER
                 .build();
 
         UserDetails michaelC = User.builder()
                 .username("michaelChukwuma")
                 .password(passwordEncoder.encode("mexasxlr"))
-                .roles("ADMIN")//ROLE_ADMIN
+                .roles(AppUserRole.ADMIN.name())//ROLE_ADMIN
                 .build();
 
         return new InMemoryUserDetailsManager(starB,michaelC);
