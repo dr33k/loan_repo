@@ -15,10 +15,10 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @Configuration
 @EnableWebSecurity
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
-
+    @Autowired
    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
+
     public AppSecurityConfig(PasswordEncoder passwordEncoder){
         this.passwordEncoder = passwordEncoder;
     }
@@ -38,12 +38,18 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @Bean
     protected UserDetailsService userDetailsService() {
-        UserDetails starBUser = User.builder()
+        UserDetails starB = User.builder()
                 .username("starButterfly")
                 .password(passwordEncoder.encode("ilovemarco"))
                 .roles("CUSTOMER")//ROLE_CUSTOMER
                 .build();
 
-        return new InMemoryUserDetailsManager(starBUser);
+        UserDetails michaelC = User.builder()
+                .username("michaelChukwuma")
+                .password(passwordEncoder.encode("mexasxlr"))
+                .roles("ADMIN")//ROLE_ADMIN
+                .build();
+
+        return new InMemoryUserDetailsManager(starB,michaelC);
     }
 }

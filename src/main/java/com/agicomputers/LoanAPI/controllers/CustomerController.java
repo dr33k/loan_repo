@@ -45,7 +45,7 @@ public class CustomerController {
     	return customerResponse;
 	}
 
-	@PostMapping("/")
+	@PostMapping
 	public CustomerResponse createCustomer(@RequestBody CustomerRequest request){
     	//Create a DTO
 		CustomerDTO cdto = new CustomerDTO();

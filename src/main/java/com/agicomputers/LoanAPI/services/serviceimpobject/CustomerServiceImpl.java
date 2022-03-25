@@ -64,13 +64,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO createCustomer(CustomerDTO cdtoReq){
-        Customer customer = new Customer(); //Customer Entity
+      /*  Customer customer = new Customer(); //Customer Entity
         BeanUtils.copyProperties(cdtoReq,customer);
 
         customer.setCustomerId(CustomerGenerator.generateCustomerId(cdtoReq.getCustomerFname(),cdtoReq.getCustomerLname()));
         customer.setCustomerPassphrase(passwordEncoder.encode(cdtoReq.getCustomerPassphrase()));
         customerRepository.save(customer);
         BeanUtils.copyProperties(customer,cdtoReq);
+        return cdtoReq;
+
+       */
+        System.out.println(cdtoReq);
         return cdtoReq;
     }
 }

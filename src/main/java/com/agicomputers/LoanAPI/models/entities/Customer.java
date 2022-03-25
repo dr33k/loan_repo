@@ -30,7 +30,7 @@ public class Customer {
     @Column(nullable = false)
     private LocalDate customerDob;
 
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL CONSTRAINT email_check CHECK( customer_email LIKE '%@%.%')")
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL UNIQUE CONSTRAINT email_check CHECK( customer_email LIKE '%@%.%')")
     private String customerEmail;
 
     @Column( columnDefinition = "VARCHAR(20) NOT NULL CONSTRAINT phone_1_check CHECK(customer_phone1 REGEXP '^[+-][0123456789]{11,15}')")
