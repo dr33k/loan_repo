@@ -35,7 +35,7 @@ public class CustomerValidator {
         validatePhoto();
         validateNIN();
         validateCustomerAddress();
-        validateCustomerOccupationDescription();
+        validateCustomerOccupationLocation();
 
         return (LinkedHashMap<String,String>)errors;
     }
@@ -95,8 +95,8 @@ public class CustomerValidator {
     private void validateCustomerAddress(){
         validateText("Address: ", cdto.getCustomerAddress());
     }
-    private void validateCustomerOccupationDescription(){
-        validateText("Occupation Description: ",cdto.getCustomerOccupationDescription());
+    private void validateCustomerOccupationLocation(){
+        validateText("Occupation Location: ",cdto.getCustomerOccupationLocation());
     }
     private void validatePhoto(){
         String photo = cdto.getCustomerPassportPhoto();
@@ -134,7 +134,7 @@ public class CustomerValidator {
         cdto.setCustomerPhone2(cdto.getCustomerPhone2().trim());
         cdto.setCustomerNIN(strip(cdto.getCustomerNIN()));
         cdto.setCustomerAddress(CustomerValidator.strip(cdto.getCustomerAddress()));
-        cdto.setCustomerOccupationDescription(CustomerValidator.strip(cdto.getCustomerOccupationDescription()));
+        cdto.setCustomerOccupationDescription(CustomerValidator.strip(cdto.getCustomerOccupationLocation()));
         cdto.setCustomerPassportPhoto(CustomerValidator.stripFile(cdto.getCustomerPassportPhoto()));
 
         return cdto;

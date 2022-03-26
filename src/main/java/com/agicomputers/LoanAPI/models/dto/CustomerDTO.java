@@ -130,12 +130,12 @@ public class CustomerDTO{
         this.customerOccupation = customerOccupation;
     }
 
-    public String getCustomerOccupationDescription() {
-        return customerOccupationDescription;
+    public String getCustomerOccupationLocation() {
+        return customerOccupationLocation;
     }
 
-    public void setCustomerOccupationDescription(String customerOccupationDescription) {
-        this.customerOccupationDescription = customerOccupationDescription;
+    public void setCustomerOccupationDescription(String customerOccupationLocation) {
+        this.customerOccupationLocation = customerOccupationLocation;
     }
 
     public Boolean getCustomerRewarded() {
@@ -168,7 +168,7 @@ public class CustomerDTO{
     private String customerPassportPhoto;
     private String customerNINPhoto;
     private CustomerOccupation customerOccupation;
-    private String customerOccupationDescription;
+    private String customerOccupationLocation;
     private Boolean customerRewarded = false;
     private Boolean isAuthenticated = false;
 }
