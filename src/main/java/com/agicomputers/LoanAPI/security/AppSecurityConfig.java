@@ -12,21 +12,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
+
    private final PasswordEncoder passwordEncoder;
+   private final CsrfTokenRepository csrfTokenRepository;
 
-
-    public AppSecurityConfig(PasswordEncoder passwordEncoder){
+    @Autowired
+    public AppSecurityConfig(PasswordEncoder passwordEncoder, CsrfTokenRepository csrfTokenRepository){
         this.passwordEncoder = passwordEncoder;
+        this.csrfTokenRepository = csrfTokenRepository;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/customer/**").hasRole(AppUserRole.CUSTOMER.name())

@@ -19,6 +19,8 @@ public class CustomerController {
 
 	@Autowired
 	CustomerService customerService;
+	@Autowired
+	CustomerValidator customerValidator;
 
     @GetMapping
 	public HashSet<CustomerResponse> getAllCustomers(){
@@ -52,9 +54,9 @@ public class CustomerController {
 		BeanUtils.copyProperties(request,cdto);
 
     	//Validate and purify input
-		CustomerValidator validator = new CustomerValidator(cdto);
-		cdto= validator.cleanObject();
-		LinkedHashMap<String, String> errors = validator.validate();
+		customerValidator.setCdto(cdto);
+		cdto= customerValidator.cleanObject();
+		LinkedHashMap<String, String> errors = customerValidator.validate();
 
 		//Create an object of the return type
 		CustomerResponse customerResponse = new CustomerResponse();
@@ -63,7 +65,10 @@ public class CustomerController {
 			cdto = customerService.createCustomer(cdto);
 			BeanUtils.copyProperties(cdto, customerResponse);
 		}
-		else	customerResponse.setErrors(errors);
+		else	{
+			customerResponse.setErrors(errors);
+			customerValidator.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
+		}
 
 		return customerResponse;
 	}

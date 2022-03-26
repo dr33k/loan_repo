@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface CustomerRepository extends CrudRepository<Customer, Long> {
 
-    @Query(value = "SELECT * FROM `loan_db.customer where customer.customerId = ?1`", nativeQuery = true)
+    @Query(value = "SELECT * FROM loan_db.customer WHERE customer_id = ?1", nativeQuery = true)
     Optional<Customer> findByCustomerId(String customerId);
 
-    @Query(value = "SELECT * FROM `loan_db.customer where customer.customerId LIKE ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM loan_db.customer WHERE customer_id LIKE ?1", nativeQuery = true)
     Iterable<Customer> findAllWithIdPattern(String sqlRegex);
 }

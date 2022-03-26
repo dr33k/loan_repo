@@ -1,7 +1,6 @@
 package com.agicomputers.LoanAPI.models.dto;
 import com.agicomputers.LoanAPI.models.enums.CustomerOccupation;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -134,7 +133,7 @@ public class CustomerDTO{
         return customerOccupationLocation;
     }
 
-    public void setCustomerOccupationDescription(String customerOccupationLocation) {
+    public void setCustomerOccupationLocation(String customerOccupationLocation) {
         this.customerOccupationLocation = customerOccupationLocation;
     }
 
