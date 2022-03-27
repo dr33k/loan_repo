@@ -54,7 +54,7 @@ public class CustomerValidator {
         validateCustomerAddress();
         validateCustomerOccupationLocation();
 
-        return (LinkedHashMap<String,String>)errors;
+        return errors;
     }
     //This method validates customerFname and customerLname properties
     //It takes a 'propertyName' argument representing either's name
@@ -84,6 +84,8 @@ public class CustomerValidator {
         catch(NullPointerException nullEx){errors.put("Email: ", EMAIL_FMT);}
     }
 
+    //This method validates using the international phone number format
+    //It validates phone1 and phone2
     private void validatePhone(String propertyName, String propertyValue){
         try {
             if (!propertyValue.matches("^[+-][0-9]{11,15}")) errors.put(propertyName, PHONE_FMT);
@@ -115,6 +117,8 @@ public class CustomerValidator {
                 errors.put("Passphrase: ", PPHRASE_OTHERS);
         } catch(NullPointerException nullEx) { errors.put("Passphrase: ", PPHRASE_LEN);}
     }
+
+    //This method validates addresses or other textbox inputs
     private void validateText(String propertyName, String propertyValue){
         try {
             String valueErrors = "";
@@ -129,18 +133,22 @@ public class CustomerValidator {
     private void validateCustomerOccupationLocation(){
         validateText("Occupation Location: ",cdto.getCustomerOccupationLocation());
     }
+
+    //This method processes uploaded images and renames them from their current temporary source to a destination on the server
     private void validatePhoto(){
         try {
             String photo = cdto.getCustomerPassportPhoto();
             File photoFile = new File(photo);
 
+            //Check if photo exists
             if(photoFile.exists()) {
+                //Check photo format
                 if (!photo.matches(".+\\.jpg$")
                         && !photo.matches(".+\\.jpeg$")
                         && !photo.matches(".+\\.png$")) {
                     errors.put("Photo: ", PHOTO_FMT);
                 } else {
-
+                    //Check photo size. Maximum limit is 500000 bytes ie 500KB
                     if (photoFile.length() > 500000) {
                         errors.put("Photo: ", PHOTO_SIZE);
                         return;
@@ -150,19 +158,22 @@ public class CustomerValidator {
                 }
             }
             else{errors.put("Photo: ", PHOTO_EX);}
-        }catch(NullPointerException nullEx){errors.put("Photo: ", PHOTO_SIZE);}
+        }catch(NullPointerException nullEx){errors.put("Photo: ", PHOTO_EX);}
     }
-
+    //This method purifies names and addresses from the request
     public static String strip(String data){
         if(!(data==null))
         data = data.trim().replaceAll("[!@#$%\\^&*()+=|{}\\\";:/?\\\\,.'<>`~\\[\\]]","");
         return data;
     }
+    //This method purifies file names from the request
     public static String stripFile(String data){
         if(!(data==null))
         data = data.trim().replaceAll("[!@#%\\^&*()+=|{}\\\";?\\\\,'<>`~\\[\\]]","");
         return data;
     }
+
+    //This method uses the strip and stripFile methods to purify user input
     public CustomerDTO cleanObject(){
         cdto.setCustomerFname(CustomerValidator.strip(cdto.getCustomerFname()));
         cdto.setCustomerLname(CustomerValidator.strip(cdto.getCustomerLname()));

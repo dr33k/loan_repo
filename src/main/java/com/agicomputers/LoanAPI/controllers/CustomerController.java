@@ -24,9 +24,11 @@ public class CustomerController {
 
     @GetMapping
 	public HashSet<CustomerResponse> getAllCustomers(){
+    	//Create a data structure to store the CustomerResponse objects
 	Set<CustomerResponse> customerResponseSet = new HashSet<>(0);
+	//Create a data structure to hold all customers returned from database
 	Set<CustomerDTO> customerDtoSet = customerService.getAllCustomers();
-
+	//Iterate through set and copy properties one after the other
 	CustomerResponse cRes;
 	for(CustomerDTO cdto: customerDtoSet) {
 		cRes = new CustomerResponse();
@@ -38,10 +40,11 @@ public class CustomerController {
 
 	@GetMapping("/{customerId}")
 	public CustomerResponse getCustomer(@PathVariable String customerId){
+    	//Return customer if any
     	CustomerDTO cdto = customerService.getCustomer(customerId);
-
+		//Handle error if any
     	if(cdto == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not Found");
-
+		//Create return type
 		CustomerResponse customerResponse = new CustomerResponse();
     	BeanUtils.copyProperties(cdto,customerResponse);
     	return customerResponse;
@@ -53,10 +56,20 @@ public class CustomerController {
 		CustomerDTO cdto = new CustomerDTO();
 		BeanUtils.copyProperties(request,cdto);
 
-    	//Validate and purify input
+    	//Validate and purify input using the CustomerValidator Component
 		customerValidator.setCdto(cdto);
 		cdto= customerValidator.cleanObject();
 		LinkedHashMap<String, String> errors = customerValidator.validate();
+
+		//Check if Email is already contained in the database
+		CustomerDTO customerWithEmail = customerService.getCustomerWithEmail(cdto.getCustomerEmail());
+		if(customerWithEmail != null){
+			if(errors.containsKey("Email: ")){
+				errors.replace("Email: ",errors.get("Email: ")+
+						"\\\nThis email elready exists");
+			}
+			else errors.put("Email: ","\nThis email already exists");
+		}
 
 		//Create an object of the return type
 		CustomerResponse customerResponse = new CustomerResponse();

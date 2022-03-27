@@ -13,4 +13,7 @@ public interface CustomerRepository extends CrudRepository<Customer, Long> {
 
     @Query(value = "SELECT * FROM loan_db.customer WHERE customer_id LIKE ?1", nativeQuery = true)
     Iterable<Customer> findAllWithIdPattern(String sqlRegex);
+
+    @Query(value = "SELECT * FROM loan_db.customer WHERE customer_email = ?1", nativeQuery = true)
+    Optional<Customer> findByEmail(String email);
 }

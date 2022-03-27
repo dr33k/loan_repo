@@ -76,6 +76,18 @@ public class CustomerServiceImpl implements CustomerService {
         return cdtoReq;
     }
 
+    @Override
+    public CustomerDTO getCustomerWithEmail(String email) {
+        Optional<Customer> customerWithEmail = customerRepository.findByEmail(email);
+        if (customerWithEmail.isPresent()){
+            Customer customer = customerWithEmail.get();
+            CustomerDTO cdto = new CustomerDTO();
+            BeanUtils.copyProperties(customer,cdto);
+            return cdto;
+        }
+        else return null;
+    }
+
     /*Customer Generator is an Inner class that generates different parts of a Customer's properties*/
     class CustomerGenerator {
 
