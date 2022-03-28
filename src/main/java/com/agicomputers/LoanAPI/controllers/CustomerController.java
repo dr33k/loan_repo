@@ -85,4 +85,17 @@ public class CustomerController {
 
 		return customerResponse;
 	}
+
+	@DeleteMapping("/{customerId}")
+	public String deleteCustomer(@PathVariable String customerId){
+    	//Return customer if any
+		Boolean response = customerService.deleteCustomer(customerId);
+		//Handle error if any
+		if (response)
+			return "Customer ".concat(customerId).concat(" deleted successfully") ;
+		else
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not Found");
+	}
+
+
 }

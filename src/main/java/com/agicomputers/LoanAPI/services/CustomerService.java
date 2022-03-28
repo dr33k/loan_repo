@@ -9,9 +9,10 @@ import java.util.Optional;
 public interface CustomerService {
 
     HashSet<CustomerDTO> getAllCustomers();
-    HashSet<CustomerDTO> getAllCustomers(String sqlRegex);
+    //HashSet<CustomerDTO> getAllCustomers(String sqlRegex);
     CustomerDTO createCustomer(CustomerDTO cdtoReq);
     CustomerDTO getCustomer(String customerId);
     CustomerDTO getCustomerWithEmail(String email);
+    Boolean deleteCustomer(String customerId);
 
 }
