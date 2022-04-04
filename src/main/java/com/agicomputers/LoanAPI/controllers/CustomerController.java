@@ -8,7 +8,9 @@ import com.agicomputers.LoanAPI.tools.validators.CustomerValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -61,16 +63,6 @@ public class CustomerController {
 		cdto= customerValidator.cleanObject();
 		LinkedHashMap<String, String> errors = customerValidator.validate();
 
-		//Check if Email is already contained in the database
-		CustomerDTO customerWithEmail = customerService.getCustomerWithEmail(cdto.getCustomerEmail());
-		if(customerWithEmail != null){
-			if(errors.containsKey("Email: ")){
-				errors.replace("Email: ",errors.get("Email: ")+
-						"\\\nThis email elready exists");
-			}
-			else errors.put("Email: ","\nThis email already exists");
-		}
-
 		//Create an object of the return type
 		CustomerResponse customerResponse = new CustomerResponse();
 		//Handle errors if any
@@ -97,5 +89,38 @@ public class CustomerController {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not Found");
 	}
 
+	@PutMapping("/{customerId}")
+	public CustomerResponse updateCustomer(@PathVariable String customerId, @RequestBody CustomerRequest request){
 
-}
+		CustomerDTO cdtoRequest = new CustomerDTO();
+		BeanUtils.copyProperties(request,cdtoRequest);
+
+		//Validate and purify input using the CustomerValidator Component
+		customerValidator.setPost(false);//Identifies a PUT operation using 'false' as POST status
+		customerValidator.setCdto(cdtoRequest);//Sets the request dto
+		cdtoRequest = customerValidator.cleanObject();
+		LinkedHashMap<String, String> errors = customerValidator.validate();
+
+		//Create an object of the return type
+		CustomerResponse customerResponse = new CustomerResponse();
+		//Handle errors if any
+		if(errors.isEmpty()) {
+			//Identify the DTO object
+			cdtoRequest.setCustomerId(customerId);
+			//Update user, reuse cdtoRequest
+			cdtoRequest = customerService.updateCustomer(cdtoRequest);
+
+			//If customer with customerId exists in database
+			if(cdtoRequest != null){
+				BeanUtils.copyProperties(cdtoRequest, customerResponse);
+			}
+			else throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Customer not found");
+		}
+		else	{
+			customerResponse.setErrors(errors);
+			customerValidator.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
+		}
+		return customerResponse;
+		}
+	}
+

@@ -13,6 +13,9 @@ public interface CustomerService {
     CustomerDTO createCustomer(CustomerDTO cdtoReq);
     CustomerDTO getCustomer(String customerId);
     CustomerDTO getCustomerWithEmail(String email);
+    CustomerDTO updateCustomer(CustomerDTO cdto);
     Boolean deleteCustomer(String customerId);
+    Boolean emailExists(String email);
+    Boolean ninExists(String nin);
 
 }

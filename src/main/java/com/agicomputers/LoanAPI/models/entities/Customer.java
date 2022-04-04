@@ -1,6 +1,7 @@
 package com.agicomputers.LoanAPI.models.entities;
 
 import com.agicomputers.LoanAPI.models.enums.CustomerOccupation;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -9,12 +10,13 @@ import java.time.LocalDate;
 @Table(name = "customer")
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //Auto Incremented
+    @SequenceGenerator(name="customer_generator", sequenceName = "customer_generator",allocationSize = 1)
+    @GeneratedValue(generator ="customer_generator",strategy = GenerationType.SEQUENCE)
 
     @Column(nullable = false )
     private long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String customerId;
 
     @Column( columnDefinition = "VARCHAR(255) NOT NULL CONSTRAINT f_name_check CHECK(CHAR_LENGTH(customer_fname) > 1)")
@@ -43,7 +45,7 @@ public class Customer {
     private String customerPassphrase;
     @Column(columnDefinition = "FLOAT NOT NULL DEFAULT 0.0")
     private Float customerBalance;
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL CONSTRAINT nin_check CHECK(customernin REGEXP '^[0123456789]{11}$')")
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL UNIQUE CONSTRAINT nin_check CHECK(customernin REGEXP '^[0123456789]{11}$')")
     private String customerNIN;
     @Column(columnDefinition = "VARCHAR(255)")
     private String customerPassportPhoto;
