@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
@@ -91,6 +92,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public CustomerDTO createCustomer(CustomerDTO cdto) {
         Customer customer = new Customer(); //Customer Entity
         BeanUtils.copyProperties(cdto, customer);
@@ -116,6 +118,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public CustomerDTO updateCustomer(CustomerDTO cdto) {
         Long id = getDbId(cdto.getCustomerId());
         Optional<Customer> customerOptional = customerRepository.findById(id);
