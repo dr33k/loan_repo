@@ -1,9 +1,11 @@
 package com.agicomputers.LoanAPI.security;
 
+import com.agicomputers.LoanAPI.models.enums.AppUserPermission;
 import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -31,10 +33,14 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors().and().csrf().disable()
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/customer/**").hasRole(AppUserRole.CUSTOMER.name())
+                .antMatchers(HttpMethod.GET,"/management/**").hasAnyRole(AppUserRole.ADMIN.name(),AppUserRole.ADMIN_TRAINEE.name())
+                .antMatchers(HttpMethod.POST,"/management/**").hasAuthority(AppUserPermission.CUSTOMER_WRITE.getPermissionString())
+                .antMatchers(HttpMethod.PUT,"/management/**").hasAuthority(AppUserPermission.CUSTOMER_WRITE.getPermissionString())
+                .antMatchers(HttpMethod.DELETE,"/management/**").hasAuthority(AppUserPermission.CUSTOMER_WRITE.getPermissionString())
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -47,15 +53,24 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         UserDetails starB = User.builder()
                 .username("starButterfly")
                 .password(passwordEncoder.encode("ilovemarco"))
-                .roles(AppUserRole.CUSTOMER.name())//ROLE_CUSTOMER
+                //.roles(AppUserRole.CUSTOMER.name())//ROLE_CUSTOMER
+                .authorities(AppUserRole.CUSTOMER.getAuthorities())
                 .build();
 
         UserDetails michaelC = User.builder()
                 .username("michaelChukwuma")
                 .password(passwordEncoder.encode("mexasxlr"))
-                .roles(AppUserRole.ADMIN.name())//ROLE_ADMIN
+               // .roles(AppUserRole.ADMIN.name())//ROLE_ADMIN
+                .authorities(AppUserRole.ADMIN.getAuthorities())
                 .build();
 
-        return new InMemoryUserDetailsManager(starB,michaelC);
+        UserDetails ebubeC = User.builder()
+                .username("ebubeChukwuma")
+                .password(passwordEncoder.encode("hashtag"))
+                //.roles(AppUserRole.ADMIN_TRAINEE.name())//ROLE_ADMIN_TRAINEE
+                .authorities(AppUserRole.ADMIN_TRAINEE.getAuthorities())
+                .build();
+
+        return new InMemoryUserDetailsManager(starB,michaelC,ebubeC);
     }
 }

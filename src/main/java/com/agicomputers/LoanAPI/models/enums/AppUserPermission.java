@@ -4,13 +4,13 @@ public enum AppUserPermission {
     CUSTOMER_READ("customer:read"),
     CUSTOMER_WRITE("customer:write");
 
-    private final String permission;
+    private final String permissionString;
 
     AppUserPermission(String permission) {
-        this.permission = permission;
+        this.permissionString = permission;
     }
 
-    public String getPermission() {
-        return permission;
+    public String getPermissionString() {
+        return permissionString;
     }
 }
