@@ -156,9 +156,9 @@ public class CustomerValidator {
         if(isPost) {
             cdto.setCustomerFname(CustomerValidator.strip(cdto.getCustomerFname()));
             cdto.setCustomerLname(CustomerValidator.strip(cdto.getCustomerLname()));
-            cdto.setCustomerEmail(cdto.getCustomerEmail().trim());
-            cdto.setCustomerPhone1(cdto.getCustomerPhone1().trim());
-            cdto.setCustomerPhone2(cdto.getCustomerPhone2().trim());
+            if(cdto.getCustomerEmail()!=null)cdto.setCustomerEmail(cdto.getCustomerEmail().trim());
+            if(cdto.getCustomerPhone1()!=null)cdto.setCustomerPhone1(cdto.getCustomerPhone1().trim());
+            if(cdto.getCustomerPhone2()!=null)cdto.setCustomerPhone2(cdto.getCustomerPhone2().trim());
             cdto.setCustomerNIN(strip(cdto.getCustomerNIN()));
             cdto.setCustomerAddress(CustomerValidator.strip(cdto.getCustomerAddress()));
             cdto.setCustomerOccupationLocation(CustomerValidator.strip(cdto.getCustomerOccupationLocation()));
