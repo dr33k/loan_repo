@@ -254,9 +254,10 @@ public class Customer implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities = Set.of(customerRole.getRoleAuthorities()).stream().map((authority)->{
-            return new SimpleGrantedAuthority(authority);
-        }).collect(Collectors.toSet());
+        Set<SimpleGrantedAuthority> authorities = Set.of(customerRole.getRoleAuthorities())
+                .stream()
+                .map((authority)->{return new SimpleGrantedAuthority(authority);})
+                .collect(Collectors.toSet());
         return authorities;    }
 
     @Override
@@ -285,5 +286,9 @@ public class Customer implements UserDetails {
 
     public void setEnabled(Boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public void setAuthorities(String... authorities){
+        customerRole.setRoleAuthorities(authorities);
     }
 }

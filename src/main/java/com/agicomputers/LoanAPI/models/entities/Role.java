@@ -1,10 +1,7 @@
 package com.agicomputers.LoanAPI.models.entities;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import javax.persistence.*;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name="role")
@@ -45,17 +42,29 @@ public class Role {
     }
 
     public void setRoleAuthorities(String[] roleAuthorities) {
-        this.roleAuthorities = roleAuthorities;
-    }
-
-    public void setRoleAuthorities(Set<? extends GrantedAuthority> authorities) {
-        String[] stringRoleAuthorities = {};
-        authorities.stream().map((authority)->{
-            return authority.toString();
-        }).collect(Collectors.toSet()).toArray(stringRoleAuthorities);
+        String[] stringRoleAuthorities= {};
+        //Add the "ROLE" authority
+        Set<String> stringRoleAuthoritiesSet = Set.of(roleAuthorities);
+        stringRoleAuthoritiesSet.add("ROLE_" + roleName.toUpperCase());
+        stringRoleAuthorities = stringRoleAuthoritiesSet.toArray(stringRoleAuthorities);
 
         this.roleAuthorities = stringRoleAuthorities;
     }
+/*
+    public void setRoleAuthorities(Set<GrantedAuthority> authorities) {
+        //Add the "ROLE" authority
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName.toUpperCase()));
+
+        String[] stringRoleAuthorities= {};
+        stringRoleAuthorities=
+                authorities.stream()
+                .map((authority)->{ return authority.toString(); })
+                .collect(Collectors.toSet()).
+                toArray(stringRoleAuthorities);
+
+        this.roleAuthorities = stringRoleAuthorities;
+    }
+*/
 
     public String getRoleDescription() {
         return roleDescription;
