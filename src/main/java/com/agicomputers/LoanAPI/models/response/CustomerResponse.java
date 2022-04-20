@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 
-@AllArgsConstructor
 @NoArgsConstructor
 
 public  class CustomerResponse implements Serializable{
@@ -150,7 +149,7 @@ public  class CustomerResponse implements Serializable{
         this.customerRewarded = customerRewarded;
     }
 
-    public Boolean getAuthenticated() {
+    public Boolean isAuthenticated() {
         return isAuthenticated;
     }
 

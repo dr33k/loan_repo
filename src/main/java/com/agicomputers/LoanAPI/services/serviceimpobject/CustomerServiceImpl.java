@@ -6,6 +6,9 @@ import com.agicomputers.LoanAPI.repositories.CustomerRepository;
 import com.agicomputers.LoanAPI.services.CustomerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +16,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class CustomerServiceImpl implements CustomerService {
+public class CustomerServiceImpl implements CustomerService, UserDetailsService {
     @Autowired
     CustomerRepository customerRepository;
     @Autowired
@@ -34,23 +37,6 @@ public class CustomerServiceImpl implements CustomerService {
         return (HashSet<CustomerDTO>) customers;
     }
 
-/*
-    @Override
-    public HashSet<CustomerDTO> getAllCustomers(String sqlRegex) {
-        Set<CustomerDTO> customers = new HashSet<CustomerDTO>(0);
-        Iterable<Customer> customersFromRepo = customerRepository.findAllWithIdPattern(sqlRegex);
-
-        CustomerDTO cdto;
-        Iterator<Customer> iterator = customersFromRepo.iterator();
-        while (iterator.hasNext()) {
-            cdto = new CustomerDTO();
-            BeanUtils.copyProperties(iterator.next(), cdto);
-            customers.add(cdto);
-        }
-        return (HashSet<CustomerDTO>) customers;
-    }
-
- */
     @Override
     public CustomerDTO getCustomer(String customerId) {
         //Extract Database Id for quicker indexed search
@@ -201,4 +187,19 @@ public class CustomerServiceImpl implements CustomerService {
             return Long.valueOf(id);
         }
 
+    //This method returns th Customer (UserDetails) Object directly without the
+    //use of a Data Transfer Object
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        //Extract Database Id for quicker indexed search
+        Long id = getDbId(username);
+
+        //Use the CustomerRepository to findBy Id
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        if (optionalCustomer.isPresent()) {
+            Customer customer = optionalCustomer.get();
+            return customer;
+        }
+        return null;
     }
+}
