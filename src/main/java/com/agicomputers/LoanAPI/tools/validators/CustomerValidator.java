@@ -2,7 +2,7 @@
 package com.agicomputers.LoanAPI.tools.validators;
 
 import com.agicomputers.LoanAPI.models.dto.CustomerDTO;
-import com.agicomputers.LoanAPI.services.CustomerService;
+import com.agicomputers.LoanAPI.services.serviceimpobject.CustomerUserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ public class CustomerValidator {
     private final String PHOTO_EX = "\nPhoto does not exist";
 
     @Autowired
-    CustomerService customerService;
+    CustomerUserServiceImpl customerService;
 
     private CustomerDTO cdto;
     private LinkedHashMap<String, String> errors = new LinkedHashMap<>(0);

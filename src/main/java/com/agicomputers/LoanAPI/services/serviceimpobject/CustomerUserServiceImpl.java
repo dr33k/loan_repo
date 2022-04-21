@@ -2,7 +2,7 @@ package com.agicomputers.LoanAPI.services.serviceimpobject;
 
 import com.agicomputers.LoanAPI.models.dto.CustomerDTO;
 import com.agicomputers.LoanAPI.models.entities.Customer;
-import com.agicomputers.LoanAPI.repositories.CustomerRepository;
+import com.agicomputers.LoanAPI.repositories.repositoryextendobject.CustomerRepository;
 import com.agicomputers.LoanAPI.services.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 /*package com.agicomputers.LoanAPI.config;
 
 import com.agicomputers.LoanAPI.models.entities.Customer;
-import com.agicomputers.LoanAPI.repositories.CustomerRepository;
+import com.agicomputers.LoanAPI.repositories.repositoryextendobject.CustomerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

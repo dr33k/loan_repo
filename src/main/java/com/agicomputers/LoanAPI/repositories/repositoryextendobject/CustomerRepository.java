@@ -1,18 +1,16 @@
-package com.agicomputers.LoanAPI.repositories;
+package com.agicomputers.LoanAPI.repositories.repositoryextendobject;
 
-import com.agicomputers.LoanAPI.models.entities.Customer;
+import com.agicomputers.LoanAPI.repositories.UserRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 @Repository
-public interface CustomerRepository extends CrudRepository<Customer, Long> {
+public interface CustomerRepository<Customer, Long> extends UserRepository<Customer,Long> {
 
     @Query(value = "SELECT * FROM loan_db.customer WHERE customer_id = ?1", nativeQuery = true)
-    Optional<Customer> findByCustomerId(String customerId);
+    Optional<Customer> findByUserId(String userId);
 
     @Query(value = "SELECT max(customer.id) FROM loan_db.customer", nativeQuery = true)
     Long findLastId();
