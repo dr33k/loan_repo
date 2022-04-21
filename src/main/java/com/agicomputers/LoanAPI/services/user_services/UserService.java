@@ -1,7 +1,7 @@
-package com.agicomputers.LoanAPI.services;
+package com.agicomputers.LoanAPI.services.user_services;
 
-import com.agicomputers.LoanAPI.models.dto.CustomerDTO;
-import com.agicomputers.LoanAPI.models.request.CustomerRequest;
+import com.agicomputers.LoanAPI.models.dto.user_dtos.CustomerDTO;
+import com.agicomputers.LoanAPI.models.request.UserRequest;
 
 import java.util.HashSet;
 

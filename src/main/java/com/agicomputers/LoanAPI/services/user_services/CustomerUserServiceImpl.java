@@ -1,9 +1,8 @@
-package com.agicomputers.LoanAPI.services.serviceimpobject;
+package com.agicomputers.LoanAPI.services.user_services;
 
-import com.agicomputers.LoanAPI.models.dto.CustomerDTO;
+import com.agicomputers.LoanAPI.models.dto.user_dtos.CustomerDTO;
 import com.agicomputers.LoanAPI.models.entities.Customer;
-import com.agicomputers.LoanAPI.repositories.repositoryextendobject.CustomerRepository;
-import com.agicomputers.LoanAPI.services.UserService;
+import com.agicomputers.LoanAPI.repositories.user_repositories.CustomerRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -84,12 +83,12 @@ public class CustomerUserServiceImpl implements UserService, UserDetailsService 
         BeanUtils.copyProperties(cdto, customer);
 
         //Set Customer's  encoded password
-        customer.setCustomerPassphrase(passwordEncoder.encode(cdto.getCustomerPassphrase()));
+        customer.setCustomerPassphrase(passwordEncoder.encode(cdto.getUserPassphrase()));
         //Save record
         customerRepository.save(customer);
 
         //Get Customer's custom generated Id and database generated id
-        String generatedCustomerId = generateCustomerId(cdto.getCustomerFname(), cdto.getCustomerLname());
+        String generatedCustomerId = generateCustomerId(cdto.getUserFname(), cdto.getUserLname());
         Long id = getDbId(generatedCustomerId);
 
         //Update saved record
@@ -106,21 +105,21 @@ public class CustomerUserServiceImpl implements UserService, UserDetailsService 
     @Override
     @Transactional
     public CustomerDTO updateUser(CustomerDTO cdto) {
-        Long id = getDbId(cdto.getCustomerId());
+        Long id = getDbId(cdto.getUserId());
         Optional<Customer> customerOptional = customerRepository.findById(id);
         if(customerOptional.isPresent()) {
             Customer customer = customerOptional.get();
-            if(cdto.getCustomerFname() != null)customer.setCustomerFname(cdto.getCustomerFname());
-            if(cdto.getCustomerLname() != null)customer.setCustomerLname(cdto.getCustomerLname());
-            if(cdto.getCustomerPhone1() != null)customer.setCustomerPhone1(cdto.getCustomerPhone1());
-            if(cdto.getCustomerPhone2() != null)customer.setCustomerPhone2(cdto.getCustomerPhone2());
-            if(cdto.getCustomerEmail() != null)customer.setCustomerEmail(cdto.getCustomerEmail());
-            if(cdto.getCustomerPassphrase() != null)customer.setCustomerPassphrase(cdto.getCustomerPassphrase());
-            if(cdto.getCustomerPassportPhoto() != null)customer.setCustomerPassportPhoto(cdto.getCustomerPassportPhoto());
-            if(cdto.getCustomerNIN() != null)customer.setCustomerNIN(cdto.getCustomerNIN());
-            if(cdto.getCustomerAddress() != null)customer.setCustomerAddress(cdto.getCustomerAddress());
-            if(cdto.getCustomerOccupation() != null)customer.setCustomerOccupation(cdto.getCustomerOccupation());
-            if(cdto.getCustomerOccupationLocation() != null)customer.setCustomerOccupationLocation(cdto.getCustomerOccupationLocation());
+            if(cdto.getUserFname() != null)customer.setCustomerFname(cdto.getUserFname());
+            if(cdto.getUserLname() != null)customer.setCustomerLname(cdto.getUserLname());
+            if(cdto.getUserPhone1() != null)customer.setCustomerPhone1(cdto.getUserPhone1());
+            if(cdto.getUserPhone2() != null)customer.setCustomerPhone2(cdto.getUserPhone2());
+            if(cdto.getUserEmail() != null)customer.setCustomerEmail(cdto.getUserEmail());
+            if(cdto.getUserPassphrase() != null)customer.setCustomerPassphrase(cdto.getUserPassphrase());
+            if(cdto.getUserPassportPhoto() != null)customer.setCustomerPassportPhoto(cdto.getUserPassportPhoto());
+            if(cdto.getUserNIN() != null)customer.setCustomerNIN(cdto.getUserNIN());
+            if(cdto.getUserAddress() != null)customer.setCustomerAddress(cdto.getUserAddress());
+            if(cdto.getUserOccupation() != null)customer.setCustomerOccupation(cdto.getUserOccupation());
+            if(cdto.getUserOccupationLocation() != null)customer.setCustomerOccupationLocation(cdto.getUserOccupationLocation());
 
             customerRepository.save(customer);
 

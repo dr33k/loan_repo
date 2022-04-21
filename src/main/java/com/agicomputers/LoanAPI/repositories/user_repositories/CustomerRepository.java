@@ -1,6 +1,5 @@
-package com.agicomputers.LoanAPI.repositories.repositoryextendobject;
+package com.agicomputers.LoanAPI.repositories.user_repositories;
 
-import com.agicomputers.LoanAPI.repositories.UserRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

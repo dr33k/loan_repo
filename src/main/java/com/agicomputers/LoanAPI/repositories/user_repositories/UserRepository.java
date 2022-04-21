@@ -1,4 +1,4 @@
-package com.agicomputers.LoanAPI.repositories;
+package com.agicomputers.LoanAPI.repositories.user_repositories;
 
 import com.agicomputers.LoanAPI.models.entities.Customer;
 import org.springframework.data.repository.CrudRepository;

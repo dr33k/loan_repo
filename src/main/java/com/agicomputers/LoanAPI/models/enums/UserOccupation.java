@@ -1,5 +1,5 @@
 package com.agicomputers.LoanAPI.models.enums;
-public enum  CustomerOccupation{
+public enum  UserOccupation{
 TEACHER,
 LAWYER,
 MEDICAL_DOCTOR,

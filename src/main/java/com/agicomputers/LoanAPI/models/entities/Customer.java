@@ -1,7 +1,6 @@
 package com.agicomputers.LoanAPI.models.entities;
 
-import com.agicomputers.LoanAPI.models.enums.CustomerOccupation;
-
+import com.agicomputers.LoanAPI.models.enums.UserOccupation;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,7 +65,7 @@ public class Customer implements UserDetails {
     private String customerNINPhoto;
 
     @Column(nullable = false)
-    private CustomerOccupation customerOccupation;
+    private UserOccupation customerOccupation;
 
     @Column(columnDefinition = "VARCHAR(255)")
     private String customerOccupationLocation;
@@ -204,11 +203,11 @@ public class Customer implements UserDetails {
         this.customerNINPhoto = customerNINPhoto;
     }
 
-    public CustomerOccupation getCustomerOccupation() {
+    public UserOccupation getCustomerOccupation() {
         return customerOccupation;
     }
 
-    public void setCustomerOccupation(CustomerOccupation customerOccupation) {
+    public void setCustomerOccupation(UserOccupation customerOccupation) {
         this.customerOccupation = customerOccupation;
     }
     public Role getCustomerRole() {    return customerRole;    }
