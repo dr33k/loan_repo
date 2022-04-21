@@ -3,7 +3,7 @@ package com.agicomputers.LoanAPI.controllers;
 import com.agicomputers.LoanAPI.models.dto.CustomerDTO;
 import com.agicomputers.LoanAPI.models.request.CustomerRequest;
 import com.agicomputers.LoanAPI.models.response.CustomerResponse;
-import com.agicomputers.LoanAPI.services.CustomerService;
+import com.agicomputers.LoanAPI.services.serviceimpobject.CustomerUserServiceImpl;
 import com.agicomputers.LoanAPI.tools.validators.CustomerValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Set;
 @RequestMapping("management/customer")
 public class CustomerManagementController {
     @Autowired
-    CustomerService customerService;
+    CustomerUserServiceImpl customerService;
     @Autowired
     CustomerValidator customerValidator;
 
@@ -30,7 +30,7 @@ public class CustomerManagementController {
         //Create a data structure to store the CustomerResponse objects
         Set<CustomerResponse> customerResponseSet = new HashSet<>(0);
         //Create a data structure to hold all customers returned from database
-        Set<CustomerDTO> customerDtoSet = customerService.getAllCustomers();
+        Set<CustomerDTO> customerDtoSet = customerService.getAllUsers();
         //Iterate through set and copy properties one after the other
         CustomerResponse cRes;
         for(CustomerDTO cdto: customerDtoSet) {
@@ -58,7 +58,7 @@ public class CustomerManagementController {
         CustomerResponse customerResponse = new CustomerResponse();
         //Handle errors if any
         if(errors.isEmpty()) {
-            cdto = customerService.createCustomer(cdto);
+            cdto = customerService.createUser(cdto);
             BeanUtils.copyProperties(cdto, customerResponse);
         }
         else	{
@@ -73,7 +73,7 @@ public class CustomerManagementController {
     @PreAuthorize("hasAuthority('customer:write')")
     public String deleteCustomer(@PathVariable String customerId){
         //Return customer if any
-        Boolean response = customerService.deleteCustomer(customerId);
+        Boolean response = customerService.deleteUser(customerId);
         //Handle error if any
         if (response)
             return "Customer ".concat(customerId).concat(" deleted successfully") ;
@@ -101,7 +101,7 @@ public class CustomerManagementController {
             //Identify the DTO object
             cdtoRequest.setCustomerId(customerId);
             //Update user, reuse cdtoRequest
-            cdtoRequest = customerService.updateCustomer(cdtoRequest);
+            cdtoRequest = customerService.updateUser(cdtoRequest);
 
             //If customer with customerId exists in database
             if(cdtoRequest != null){

@@ -3,7 +3,7 @@ package com.agicomputers.LoanAPI.services.serviceimpobject;
 import com.agicomputers.LoanAPI.models.dto.CustomerDTO;
 import com.agicomputers.LoanAPI.models.entities.Customer;
 import com.agicomputers.LoanAPI.repositories.CustomerRepository;
-import com.agicomputers.LoanAPI.services.CustomerService;
+import com.agicomputers.LoanAPI.services.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,14 +16,14 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class CustomerServiceImpl implements CustomerService, UserDetailsService {
+public class CustomerUserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     CustomerRepository customerRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
 
     @Override
-    public HashSet<CustomerDTO> getAllCustomers() {
+    public HashSet<CustomerDTO> getAllUsers() {
         Set<CustomerDTO> customers = new HashSet<CustomerDTO>(0);
         Iterable<Customer> customersFromRepo = customerRepository.findAll();
 
@@ -38,7 +38,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
     }
 
     @Override
-    public CustomerDTO getCustomer(String customerId) {
+    public CustomerDTO getUser(String customerId) {
         //Extract Database Id for quicker indexed search
         Long id = getDbId(customerId);
 
@@ -54,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
     }
 
     @Override
-    public CustomerDTO getCustomerWithEmail(String email) {
+    public CustomerDTO getUserWithEmail(String email) {
         Optional<Customer> customerWithEmail = customerRepository.findByEmail(email);
         if (customerWithEmail.isPresent()){
             Customer customer = customerWithEmail.get();
@@ -66,7 +66,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
     }
 
     @Override
-    public Boolean deleteCustomer(String customerId) {
+    public Boolean deleteUser(String customerId) {
         //Extract Database Id for quicker indexed search
         Long id = getDbId(customerId);
 
@@ -79,7 +79,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
 
     @Override
     @Transactional
-    public CustomerDTO createCustomer(CustomerDTO cdto) {
+    public CustomerDTO createUser(CustomerDTO cdto) {
         Customer customer = new Customer(); //Customer Entity
         BeanUtils.copyProperties(cdto, customer);
 
@@ -105,7 +105,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
 
     @Override
     @Transactional
-    public CustomerDTO updateCustomer(CustomerDTO cdto) {
+    public CustomerDTO updateUser(CustomerDTO cdto) {
         Long id = getDbId(cdto.getCustomerId());
         Optional<Customer> customerOptional = customerRepository.findById(id);
         if(customerOptional.isPresent()) {
