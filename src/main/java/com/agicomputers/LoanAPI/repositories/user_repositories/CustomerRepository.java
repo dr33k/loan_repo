@@ -1,12 +1,13 @@
 package com.agicomputers.LoanAPI.repositories.user_repositories;
 
+import com.agicomputers.LoanAPI.models.entities.Customer;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 @Repository
-public interface CustomerRepository<Customer, Long> extends UserRepository<Customer,Long> {
+public interface CustomerRepository extends UserRepository<Customer,Long> {
 
     @Query(value = "SELECT * FROM loan_db.customer WHERE customer_id = ?1", nativeQuery = true)
     Optional<Customer> findByUserId(String userId);
