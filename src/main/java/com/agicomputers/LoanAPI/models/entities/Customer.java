@@ -31,7 +31,7 @@ public class Customer implements UserDetails {
     private String customerLname;
     
     @ManyToOne
-    @JoinColumn(name="role_id",referencedColumnName = "id")
+    @JoinColumn(name="role_id",referencedColumnName = "id",insertable = false, updatable = false)
     private Role customerRole;
 
     @Column(nullable = false)

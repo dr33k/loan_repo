@@ -14,7 +14,18 @@ public class Role {
     @Column(nullable = false)
     private String roleName;
 
-    @Column(columnDefinition = "TEXT[] NOT NULL")
+    @Transient
+    final private String roleAuthoritiesColumnDefinition = "SET("+
+            "'customer:read'," +
+            "'customer:write', " +
+            "'admin:read'," +
+            "'admin:write'"+
+            ") NOT NULL";
+
+    //The values above need to be defined on creation of the table
+    //They can always be modified here
+
+    @Column(columnDefinition = roleAuthoritiesColumnDefinition)
     private String[] roleAuthorities;
 
     @Column(nullable = false)
