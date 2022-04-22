@@ -17,12 +17,16 @@ import java.util.*;
 @RequestMapping("/customer")
 public class CustomerController implements UserController {
 
-	@Autowired
 	CustomerUserServiceImpl customerService;
-	@Autowired
 	CustomerValidator customerValidator;
 
-    @Override
+	@Autowired
+	public CustomerController(CustomerUserServiceImpl customerService, CustomerValidator customerValidator) {
+		this.customerService = customerService;
+		this.customerValidator = customerValidator;
+	}
+
+	@Override
 	public HashSet<UserResponse> getAllUsers(){
     	//Create a data structure to store the UserResponse objects
 	Set<UserResponse> customerResponseSet = new HashSet<>(0);

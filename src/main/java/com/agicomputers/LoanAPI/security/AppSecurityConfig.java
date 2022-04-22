@@ -63,30 +63,4 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         .logoutSuccessUrl("/login");
     }
 
-    @Override
-    @Bean
-    protected UserDetailsService userDetailsService() {
-        UserDetails starB = User.builder()
-                .username("starButterfly")
-                .password(passwordEncoder.encode("ilovemarco"))
-                //.roles(AppUserRole.CUSTOMER.name())//ROLE_CUSTOMER
-                .authorities(AppUserRole.CUSTOMER.getAuthorities())
-                .build();
-
-        UserDetails michaelC = User.builder()
-                .username("michaelChukwuma")
-                .password(passwordEncoder.encode("mexasxlr"))
-               // .roles(AppUserRole.ADMIN.name())//ROLE_ADMIN
-                .authorities(AppUserRole.ADMIN.getAuthorities())
-                .build();
-
-        UserDetails ebubeC = User.builder()
-                .username("ebubeChukwuma")
-                .password(passwordEncoder.encode("hashtag"))
-                //.roles(AppUserRole.ADMIN_TRAINEE.name())//ROLE_ADMIN_TRAINEE
-                .authorities(AppUserRole.ADMIN_TRAINEE.getAuthorities())
-                .build();
-
-        return new InMemoryUserDetailsManager(starB,michaelC,ebubeC);
-    }
 }

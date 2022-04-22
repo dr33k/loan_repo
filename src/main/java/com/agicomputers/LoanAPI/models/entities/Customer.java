@@ -31,7 +31,7 @@ public class Customer implements UserDetails {
     private String customerLname;
     
     @ManyToOne
-    @JoinColumn(name="role_id",referencedColumnName = "id",insertable = false, updatable = false)
+    @JoinColumn(name="role_id",referencedColumnName = "id")
     private Role customerRole;
 
     @Column(nullable = false)
@@ -75,16 +75,16 @@ public class Customer implements UserDetails {
 
     //Derived Properties from User Details
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isAccountNonExpired = false;
+    private Boolean isAccountNonExpired = true;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isAccountNonLocked = false;
+    private Boolean isAccountNonLocked = true;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isCredentialsNonExpired = false;
+    private Boolean isCredentialsNonExpired = true;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isEnabled = false;
+    private Boolean isEnabled = true;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isAuthenticated = false;

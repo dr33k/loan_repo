@@ -11,7 +11,9 @@ import java.io.File;
 
 @Component
 public class CustomerValidator implements UserValidator {
-    
+    @Autowired
+    CustomerUserServiceImpl customerService;
+
     CustomerDTO dto = null;
     LinkedHashMap<String, String> errors = new LinkedHashMap<>(0);
     Boolean isPost = true;
@@ -39,9 +41,6 @@ public class CustomerValidator implements UserValidator {
     public void setErrors(LinkedHashMap<String, String> errors) {
         this.errors = errors;
     }
-
-    @Autowired
-    CustomerUserServiceImpl customerService;
 
     //This method validates customerFname and customerLname properties
     //It takes a 'propertyName' argument representing either's name

@@ -5,6 +5,7 @@ import com.agicomputers.LoanAPI.models.entities.Customer;
 import com.agicomputers.LoanAPI.repositories.user_repositories.CustomerRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,10 +17,15 @@ import java.util.*;
 
 @Service
 public class CustomerUserServiceImpl implements UserService, UserDetailsService {
-    @Autowired
+
     CustomerRepository customerRepository;
-    @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public CustomerUserServiceImpl(@Qualifier("customerRepository1") CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+        this.customerRepository = customerRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public HashSet<CustomerDTO> getAllUsers() {

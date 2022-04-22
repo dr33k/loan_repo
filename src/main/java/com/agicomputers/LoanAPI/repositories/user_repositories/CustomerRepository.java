@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-@Repository
+@Repository("customerRepository1")
 public interface CustomerRepository extends UserRepository<Customer,Long> {
 
     @Query(value = "SELECT * FROM loan_db.customer WHERE customer_id = ?1", nativeQuery = true)
