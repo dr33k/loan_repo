@@ -1,7 +1,13 @@
 package com.agicomputers.LoanAPI.models.entities;
 
+import com.agicomputers.LoanAPI.models.enums.AppUserPermission;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import javax.persistence.*;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="role")
@@ -26,11 +32,26 @@ public class Role {
     //They can always be modified here
 
     @Column(columnDefinition = roleAuthoritiesColumnDefinition)
-    private String[] roleAuthorities;
+    private String[] roleAuthorities = {};
 
     @Column(nullable = false)
     private String roleDescription;
 
+    public Role(Integer id, String roleName, Set<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.roleName = roleName;
+
+//map Set<? extends GrantedAuthorities> into List<String>, add the ROLE and then assign to roleAuthorities
+        List<String> temp =
+                authorities
+                .stream()
+                .map((authority)->{return authority.toString();})
+                .collect(Collectors.toList());
+        temp.add("ROLE_" + roleName.toUpperCase());
+
+        this.roleAuthorities = temp.toArray(this.roleAuthorities);
+
+    }
 
     public Integer getId() {
         return id;
@@ -52,7 +73,7 @@ public class Role {
         return roleAuthorities;
     }
 
-    public void setRoleAuthorities(String[] roleAuthorities) {
+    public void setRoleAuthorities(String... roleAuthorities) {
         String[] stringRoleAuthorities= {};
         //Add the "ROLE" authority
         Set<String> stringRoleAuthoritiesSet = Set.of(roleAuthorities);
@@ -61,7 +82,7 @@ public class Role {
 
         this.roleAuthorities = stringRoleAuthorities;
     }
-/*
+
     public void setRoleAuthorities(Set<GrantedAuthority> authorities) {
         //Add the "ROLE" authority
         authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName.toUpperCase()));
@@ -75,7 +96,7 @@ public class Role {
 
         this.roleAuthorities = stringRoleAuthorities;
     }
-*/
+
 
     public String getRoleDescription() {
         return roleDescription;

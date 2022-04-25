@@ -12,7 +12,7 @@ public enum AppUserRole {
     ADMIN(new HashSet<AppUserPermission>(Set.of(
             AppUserPermission.CUSTOMER_READ,
             AppUserPermission.CUSTOMER_WRITE))),
-    ADMIN_TRAINEE(new HashSet<>(Set.of(
+    ADMINTRAINEE(new HashSet<>(Set.of(
             AppUserPermission.CUSTOMER_READ)));
 
     private final Set<AppUserPermission> permissions;

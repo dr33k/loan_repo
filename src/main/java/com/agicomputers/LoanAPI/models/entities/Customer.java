@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "customer")
+
 public class Customer implements UserDetails {
     @Id
     @SequenceGenerator(name="customer_generator", sequenceName = "customer_generator",allocationSize = 1)
@@ -89,6 +90,12 @@ public class Customer implements UserDetails {
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isAuthenticated = false;
 
+    public Customer(){}
+    public Customer(String customerId, String customerPassphrase, Role customerRole) {
+        this.customerId = customerId;
+        this.customerRole = customerRole;
+        this.customerPassphrase = customerPassphrase;
+    }
 
     //Getters & Setters
     public long getId() {

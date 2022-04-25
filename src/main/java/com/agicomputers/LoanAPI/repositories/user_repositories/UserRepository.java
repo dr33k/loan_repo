@@ -14,4 +14,6 @@ public interface UserRepository<T,ID> extends CrudRepository<T, ID> {
     Optional<ID> existsByNin(String nin);
     Optional<ID> existsByEmail(String email);
     void updateCustomerId(ID id, String value);
+    Long findLastId();
+
 }

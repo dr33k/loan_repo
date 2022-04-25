@@ -2,7 +2,9 @@ package com.agicomputers.LoanAPI.services.user_services;
 
 import com.agicomputers.LoanAPI.models.dto.user_dtos.CustomerDTO;
 import com.agicomputers.LoanAPI.models.entities.Customer;
+import com.agicomputers.LoanAPI.repositories.user_repositories.AuthenticatedUserRepository;
 import com.agicomputers.LoanAPI.repositories.user_repositories.CustomerRepository;
+import com.agicomputers.LoanAPI.repositories.user_repositories.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,13 +20,17 @@ import java.util.*;
 @Service
 public class CustomerUserServiceImpl implements UserService, UserDetailsService {
 
-    CustomerRepository customerRepository;
+    UserRepository customerRepository;
     PasswordEncoder passwordEncoder;
+    AuthenticatedUserRepository authenticatedUserRepository;
 
     @Autowired
-    public CustomerUserServiceImpl(@Qualifier("customerRepository1") CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+    public CustomerUserServiceImpl(@Qualifier("customerRepository1") UserRepository customerRepository,
+                                   PasswordEncoder passwordEncoder,
+                                   AuthenticatedUserRepository authenticatedUserRepository) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticatedUserRepository=  authenticatedUserRepository;
     }
 
     @Override
@@ -194,17 +200,12 @@ public class CustomerUserServiceImpl implements UserService, UserDetailsService 
 
     //This method returns th Customer (UserDetails) Object directly without the
     //use of a Data Transfer Object
+    //It is used for authentication by the container's DaoAuthenticationProvider
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //Extract Database Id for quicker indexed search
-        Long id = getDbId(username);
 
-        //Use the CustomerRepository to findBy Id
-        Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        if (optionalCustomer.isPresent()) {
-            Customer customer = optionalCustomer.get();
-            return customer;
-        }
-        return null;
+        return authenticatedUserRepository.getAuthenticatedUser(username)
+                .orElseThrow(()->new UsernameNotFoundException(String.format("Username %s not found",username)));
+
     }
 }
