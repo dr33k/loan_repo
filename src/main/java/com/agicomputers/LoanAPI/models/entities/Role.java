@@ -47,7 +47,7 @@ public class Role {
                 .stream()
                 .map((authority)->{return authority.toString();})
                 .collect(Collectors.toList());
-        temp.add("ROLE_" + roleName.toUpperCase());
+        if(!temp.contains("ROLE_" + roleName.toUpperCase()))temp.add("ROLE_" + roleName.toUpperCase());
 
         this.roleAuthorities = temp.toArray(this.roleAuthorities);
 
@@ -77,7 +77,8 @@ public class Role {
         String[] stringRoleAuthorities= {};
         //Add the "ROLE" authority
         Set<String> stringRoleAuthoritiesSet = Set.of(roleAuthorities);
-        stringRoleAuthoritiesSet.add("ROLE_" + roleName.toUpperCase());
+        if(!stringRoleAuthoritiesSet.contains("ROLE_" + roleName.toUpperCase()))
+            stringRoleAuthoritiesSet.add("ROLE_" + roleName.toUpperCase());
         stringRoleAuthorities = stringRoleAuthoritiesSet.toArray(stringRoleAuthorities);
 
         this.roleAuthorities = stringRoleAuthorities;
