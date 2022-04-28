@@ -43,9 +43,9 @@ public class CustomerController implements UserController {
 	}
 
 	@Override
-	public UserResponse getUser(@PathVariable String customerId){
+	public UserResponse getUser(@PathVariable String userId){
     	//Return customer if any
-    	CustomerDTO cdto = customerService.getUser(customerId);
+    	CustomerDTO cdto = customerService.getUser(userId);
 		//Handle error if any
     	if(cdto == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not Found");
 		//Create return type
@@ -81,18 +81,18 @@ public class CustomerController implements UserController {
 	}
 
 	@Override
-	public String deleteUser(@PathVariable String customerId){
+	public String deleteUser(@PathVariable String userId){
     	//Return customer if any
-		Boolean response = customerService.deleteUser(customerId);
+		Boolean response = customerService.deleteUser(userId);
 		//Handle error if any
 		if (response)
-			return "Customer ".concat(customerId).concat(" deleted successfully") ;
+			return "Customer ".concat(userId).concat(" deleted successfully") ;
 		else
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not Found");
 	}
 
 	@Override
-	public UserResponse updateUser(@PathVariable String customerId, @RequestBody UserRequest request){
+	public UserResponse updateUser(@PathVariable String userId, @RequestBody UserRequest request){
 
 		CustomerDTO cdtoRequest = new CustomerDTO();
 		BeanUtils.copyProperties(request,cdtoRequest);
@@ -108,7 +108,7 @@ public class CustomerController implements UserController {
 		//Handle errors if any
 		if(errors.isEmpty()) {
 			//Identify the DTO object
-			cdtoRequest.setUserId(customerId);
+			cdtoRequest.setUserId(userId);
 			//Update user, reuse cdtoRequest
 			cdtoRequest = customerService.updateUser(cdtoRequest);
 

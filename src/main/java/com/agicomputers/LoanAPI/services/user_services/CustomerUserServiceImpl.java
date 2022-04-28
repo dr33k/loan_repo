@@ -51,7 +51,8 @@ public class CustomerUserServiceImpl implements UserService, UserDetailsService 
     @Override
     public CustomerDTO getUser(String customerId) {
         //Extract Database Id for quicker indexed search
-        Long id = getDbId(customerId);
+        try {
+            Long id = getDbId(customerId);
 
         //Use the CustomerRepository to findBy Id
        Optional<Customer> optionalCustomer = customerRepository.findById(id);
@@ -60,6 +61,10 @@ public class CustomerUserServiceImpl implements UserService, UserDetailsService 
             CustomerDTO cdto = new CustomerDTO();
             BeanUtils.copyProperties(customer, cdto);
             return cdto;
+        }
+
+      }catch (NumberFormatException ex){
+            return null;
         }
       return null;
     }
@@ -79,12 +84,14 @@ public class CustomerUserServiceImpl implements UserService, UserDetailsService 
     @Override
     public Boolean deleteUser(String customerId) {
         //Extract Database Id for quicker indexed search
-        Long id = getDbId(customerId);
+        try {
+            Long id = getDbId(customerId);
 
-        if (customerRepository.existsById(id)) {
-            customerRepository.deleteById(id);
-            return true;
-        }
+            if (customerRepository.existsById(id)) {
+                customerRepository.deleteById(id);
+                return true;
+            }
+        }catch (NumberFormatException ex){return false;}
         return false;
     }
 
@@ -193,7 +200,7 @@ public class CustomerUserServiceImpl implements UserService, UserDetailsService 
             return newId;
         }
 
-        private Long getDbId(String customerId){
+        private Long getDbId(String customerId) throws NumberFormatException{
             String id = customerId.substring(3,customerId.length()-3);
             return Long.valueOf(id);
         }

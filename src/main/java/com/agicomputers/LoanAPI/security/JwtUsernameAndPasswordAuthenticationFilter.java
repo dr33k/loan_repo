@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
@@ -66,18 +67,15 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                                             Authentication authResult) throws IOException, ServletException {
 
 
-        //SecretKey secret = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.PS256);
-        PrivateKey key = keyPair.getPrivate();
-
         String token = Jwts.builder().setSubject(authResult.getName())
                 .claim("authorities",authResult.getAuthorities())
                 .setIssuedAt(new Date()) // for example, now
-                .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusWeeks(2))) //a java.util.Date
+                .setExpiration(SecurityConstants.EXPIRY) //a java.sql.Date
                 .setId(UUID.randomUUID().toString())
-                .signWith(key)
+                .signWith(SecurityConstants.ENCRYPTING_KEY)
                 .compact();
 
-        response.addHeader("Authorisation","Bearer "+token);
+        response.addHeader("Authorisation",SecurityConstants.PREFIX+token);
+
     }
 }

@@ -12,7 +12,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.concurrent.TimeUnit;
@@ -39,14 +42,23 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-               // .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-               // .and()
                 .authorizeRequests()
                 .antMatchers("/customer/**").hasRole(AppUserRole.CUSTOMER.name())
                 .anyRequest().authenticated()
 
                 .and()
-                .formLogin()
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JwtVerificationFilter(),JwtUsernameAndPasswordAuthenticationFilter.class)
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        ;
+
+
+                /* .and()
+                   .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                   .and()
+                 */
+                /*.formLogin()
                 .loginPage("/login").permitAll()
                 .usernameParameter("username")
                 .passwordParameter("password")
@@ -60,13 +72,15 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .key("secret")
 
                 .and()
-        .logout()
-        .logoutRequestMatcher(new AntPathRequestMatcher("/logout","GET"))
-        .logoutUrl("/logout")
-        .clearAuthentication(true)
-        .invalidateHttpSession(true)
-        .deleteCookies("JSESSIONID","remember-me")
-        .logoutSuccessUrl("/login");
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout","GET"))
+                .logoutUrl("/logout")
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID","remember-me")
+                .logoutSuccessUrl("/login");
+
+                 */
     }
 
     @Override
