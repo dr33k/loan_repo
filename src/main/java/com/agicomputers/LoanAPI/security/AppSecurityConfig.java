@@ -1,11 +1,13 @@
 package com.agicomputers.LoanAPI.security;
 
+import com.agicomputers.LoanAPI.models.enums.AppUserPermission;
 import com.agicomputers.LoanAPI.models.enums.AppUserRole;
-import com.agicomputers.LoanAPI.services.user_services.CustomerUserServiceImpl;
+import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -15,7 +17,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.concurrent.TimeUnit;
@@ -26,61 +33,59 @@ import io.jsonwebtoken.Jwts;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
    private final PasswordEncoder passwordEncoder;
-   private final CustomerUserServiceImpl customerUserService;
+   private final AppUserServiceImpl appUserService;
 
     @Autowired
-    public AppSecurityConfig( PasswordEncoder passwordEncoder, CustomerUserServiceImpl customerUserService){
+    public AppSecurityConfig( PasswordEncoder passwordEncoder,
+                              AppUserServiceImpl appUserService){
         this.passwordEncoder = passwordEncoder;
-        this.customerUserService = customerUserService;
+        this.appUserService = appUserService;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .invalidSessionUrl("/invalid_session")
+
+
+                .and()
                 .authorizeRequests()
-                .antMatchers("/customer/**").hasRole(AppUserRole.CUSTOMER.name())
+                .antMatchers("/**").permitAll()
+                .antMatchers(HttpMethod.POST,"/app_user/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
-                .addFilterAfter(new JwtVerificationFilter(),JwtUsernameAndPasswordAuthenticationFilter.class)
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        ;
-
-
-                /* .and()
-                   .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                   .and()
-                 */
-                /*.formLogin()
-                .loginPage("/login").permitAll()
+                .formLogin()
+                .loginPage("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/customers",true)
+                .defaultSuccessUrl("/home")
+
 
                 .and()
                 .rememberMe()
                 .rememberMeParameter("remember-me")
-                .userDetailsService(this.userDetailsService())
-                .tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
-                .key("secret")
+                .tokenRepository(new InMemoryTokenRepositoryImpl())
+                .tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(14))
+                .key(SecurityConstants.KEY)
+
 
                 .and()
                 .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout","GET"))
                 .logoutUrl("/logout")
+                .logoutSuccessUrl("/login")
                 .clearAuthentication(true)
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID","remember-me")
-                .logoutSuccessUrl("/login");
-
-                 */
+                .deleteCookies("JSESSION","remember-me")
+                .invalidateHttpSession(true);
     }
 
     @Override
@@ -92,9 +97,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     public DaoAuthenticationProvider daoAuthenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder);
-        provider.setUserDetailsService(customerUserService);
+        provider.setUserDetailsService(appUserService);
         return provider;
     }
-
 
 }

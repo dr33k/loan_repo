@@ -1,20 +1,31 @@
 {
-"root":{
-	"username":"root",
-	"password":"###hashtag###"
-},	
-"dbadmin": {
-	"username":"DB Administrator",
-	"password":"1nt3rd1m3n510n4lc4bl3"
+	"mysql": {
+		"root": {
+			"username": "root",
+			"password": "###hashtag###"
+		},
+		"dbadmin": {
+			"username": "DB Administrator",
+			"password": "1nt3rd1m3n510n4lc4bl3"
+		},
+		"appadmin": {
+			"username": "App Administrator",
+			"password": "mrm3531k5"
+		},
+		"dreek": {
+			"username": "dreek",
+			"password": "#hashtag#"
+		}
 	},
 
-"appadmin": {
-	"username":"App Administrator",
-	"password":"mrm3531k5"
-	},
-"dreek":{
-	"username":"dreek",
-	"password":"#hashtag#"
-}
-
+	"postgresql": {
+		"postgres": {
+			"username": "postgres",
+			"password": "###hashtag###"
+		},
+		"superdreek": {
+			"username": "superdreek",
+			"password": "###hashtag###"
+		}
+	}
 }

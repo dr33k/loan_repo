@@ -1,6 +1,8 @@
 package com.agicomputers.LoanAPI.models.entities;
 
 import com.agicomputers.LoanAPI.models.enums.AppUserPermission;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -15,30 +17,22 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Integer id;
+    private Integer role_id;
 
     @Column(nullable = false)
     private String roleName;
 
-    @Transient
-    final private String roleAuthoritiesColumnDefinition = "SET("+
-            "'customer:read'," +
-            "'customer:write', " +
-            "'admin:read'," +
-            "'admin:write'"+
-            ") NOT NULL";
+    @Column(columnDefinition = "role_enum NOT NULL DEFAULT 'APPUSER'")
+    private String roleType;
 
-    //The values above need to be defined on creation of the table
-    //They can always be modified here
-
-    @Column(columnDefinition = roleAuthoritiesColumnDefinition)
-    private String[] roleAuthorities = {};
+    @Column(nullable = false)
+    private String[] roleAuthorities = {"app_user:read"};
 
     @Column(nullable = false)
     private String roleDescription;
 
     public Role(Integer id, String roleName, Set<? extends GrantedAuthority> authorities) {
-        this.id = id;
+        this.role_id = id;
         this.roleName = roleName;
 
 //map Set<? extends GrantedAuthorities> into List<String>, add the ROLE and then assign to roleAuthorities
@@ -54,11 +48,11 @@ public class Role {
     }
 
     public Integer getId() {
-        return id;
+        return this.role_id;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        this.role_id = id;
     }
 
     public String getRoleName() {

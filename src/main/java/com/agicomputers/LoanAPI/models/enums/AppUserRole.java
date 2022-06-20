@@ -8,12 +8,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum AppUserRole {
-    CUSTOMER(new HashSet<>()),
     ADMIN(new HashSet<AppUserPermission>(Set.of(
-            AppUserPermission.CUSTOMER_READ,
-            AppUserPermission.CUSTOMER_WRITE))),
-    ADMINTRAINEE(new HashSet<>(Set.of(
-            AppUserPermission.CUSTOMER_READ)));
+            AppUserPermission.APPUSER_READ,
+            AppUserPermission.APPUSER_WRITE))),
+    APPUSER(new HashSet<>(Set.of(
+            AppUserPermission.APPUSER_READ)));
 
     private final Set<AppUserPermission> permissions;
 

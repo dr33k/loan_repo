@@ -27,6 +27,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader("Authorisation");
         if(bearerToken == null || bearerToken == "" || !bearerToken.contains("Bearer ")){
             filterChain.doFilter(request,response);
+            return;
         }
 
         try {

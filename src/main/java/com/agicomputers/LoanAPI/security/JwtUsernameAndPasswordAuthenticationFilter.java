@@ -1,6 +1,5 @@
 package com.agicomputers.LoanAPI.security;
 
-import com.agicomputers.LoanAPI.models.dto.user_dtos.UserDTO;
 import com.agicomputers.LoanAPI.models.request.UsernameAndPasswordAuthenticationRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;

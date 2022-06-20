@@ -8,14 +8,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/")
 public class TemplateController  {
 
+    @GetMapping()
+    public String getHomePage() {
+        return "home";
+    }
+
     @GetMapping("login")
-    public String getLoginPage(){
+    public String getLoginPage() {
         return "login";
     }
 
-
-    @GetMapping("customers")
-    public String getCustomersPage(){
-        return "customers";
+    @GetMapping("invalid_session")
+    public String getInvalidSessionPage(){
+        return "invalid_session";
     }
 }
+
+

@@ -1,8 +1,43 @@
-Include your java directory as a vs code java source file
-download maven
-include JAVA_HOME as a in env
-include MAVEN_HOME in env
-include maven's bin directory
-include "java.home".in settings .json
-update pom file
-run mvn clean package -U
+  .csrf().disable()
+
+                //JWT BASED AUTHENTICATION
+
+                .authorizeRequests()
+                .antMatchers("/app_user/**").hasRole(AppUserRole.APPUSER.name())
+                .anyRequest().authenticated()
+
+                .and()
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JwtVerificationFilter(),JwtUsernameAndPasswordAuthenticationFilter.class)
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        ;
+
+
+                //FORM BASED AUTHENTICATION
+                 .and()
+                   .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                   .and()
+
+
+                .formLogin()
+                .loginPage("/login").permitAll()
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/home",true)
+
+                .and()
+                .rememberMe()
+                .rememberMeParameter("remember-me")
+                .userDetailsService(this.userDetailsService())
+                .tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
+                .key(SecurityConstants.KEY)
+
+                .and()
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout","GET"))
+                .logoutUrl("/logout")
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID","remember-me")
+                .logoutSuccessUrl("/login");
