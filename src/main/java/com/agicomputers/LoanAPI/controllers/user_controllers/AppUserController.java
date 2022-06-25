@@ -4,139 +4,206 @@ import com.agicomputers.LoanAPI.models.request.AppUserRequest;
 import com.agicomputers.LoanAPI.models.response.AppUserResponse;
 import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
 import com.agicomputers.LoanAPI.services.user_services.AppUserValidatorService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import com.agicomputers.LoanAPI.models.dto.user_dtos.AppUserDTO;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/app_user")
-public class AppUserController{
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class AppUserController {
+    @Autowired
+    private final AppUserServiceImpl appUserService;
+    @Autowired
+    private AppUserValidatorService appUserValidatorService;
 
-	AppUserServiceImpl appUserService;
-	AppUserValidatorService appUserValidatorService;
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping
+    public ResponseEntity<AppUserResponse> getAllUsers() {
+        //Create a data structure to hold all appUsers returned from database
+        Set<AppUserDTO> appUserDtoSet = appUserService.getAllUsers();
+        // Instance of VisibleAppUserData, not all details should be exposed to the client
+        AppUserResponse.VisibleAppUserData vaud = AppUserResponse.getVisibleAppUserDataInstance();
+        //Using a stream, convert the Set ofAppUserDTO types into a Set of VisibleAppUserData
+        Set<AppUserResponse.VisibleAppUserData> vaudSet = appUserDtoSet.stream().map(
+                (AppUserDTO udto) -> {
+                    BeanUtils.copyProperties(udto, vaud);
+                    return vaud;
+                }
+        ).collect(Collectors.toSet());
 
-	@Autowired
-	public AppUserController(AppUserServiceImpl appUserService, AppUserValidatorService appUserValidatorService) {
-		this.appUserService = appUserService;
-		this.appUserValidatorService = appUserValidatorService;
-	}
+
+        //Return entity containing the users
+        return ResponseEntity.ok(
+                AppUserResponse.builder()
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .userDataSet(vaudSet)
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+
+    }
+
+    @PreAuthorize("hasAuthority('appuser:read')")
+    @GetMapping("/{uid}")
+    public ResponseEntity<AppUserResponse> getUser(@PathVariable String uid) {
+        //Validate the Uid provided
+        if (appUserValidatorService.validateUid(uid)) {
+            //Return appUser if any
+            AppUserDTO udto = appUserService.getUser(uid);
+            //Handle error if any
+            if (udto == null)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found; Valid UID but User account may have been deleted ");
+            // Instance of VisibleAppUserData, not all details should be exposed to the client
+            AppUserResponse.VisibleAppUserData vaud = AppUserResponse.getVisibleAppUserDataInstance();
+            BeanUtils.copyProperties(udto,vaud);
+            //Return entity containing the users
+            return ResponseEntity.ok(
+                    AppUserResponse.builder()
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .userDataSet(Set.of(vaud))
+                            .timestamp(LocalDateTime.now())
+                            .build()
+            );
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AppUserResponse> createUser(@RequestBody AppUserRequest request) {
+        //Create a DTO
+        AppUserDTO udto = new AppUserDTO();
+        BeanUtils.copyProperties(request, udto);
+
+        //Validate and purify input using the UserValidator Component
+        appUserValidatorService.setDto(udto);
+        udto = appUserValidatorService.cleanObject();
+        LinkedHashMap<String, String> errors = appUserValidatorService.validate();
+
+        //Handle errors if any
+        if (errors.isEmpty()) {
+            udto = appUserService.createUser(udto);
 
 
-	//@PreAuthorize("hasRole('ROLE_ADMIN')")
-	@GetMapping
-	public HashSet<AppUserResponse> getAllUsers(){
-    	//Create a data structure to store the AppUserResponse objects
-	Set<AppUserResponse> appAppUserResponseSet = new HashSet<>(0);
-	//Create a data structure to hold all appUsers returned from database
-	Set<AppUserDTO> appUserDtoSet = appUserService.getAllUsers();
-	//Iterate through set and copy properties one after the other
-	AppUserResponse cRes;
-	for(AppUserDTO udto: appUserDtoSet) {
-		cRes = new AppUserResponse();
-		BeanUtils.copyProperties(udto,cRes);
-		appAppUserResponseSet.add(cRes);
-	}
-	return (HashSet<AppUserResponse>) appAppUserResponseSet;
-	}
+            // Instance of VisibleAppUserData, not all details should be exposed to the client
+            AppUserResponse.VisibleAppUserData vaud = AppUserResponse.getVisibleAppUserDataInstance();
+            BeanUtils.copyProperties(udto,vaud);
+            //Return ResponseEntity containing the users
+            return ResponseEntity.ok(
+                    AppUserResponse.builder()
+                            .status(HttpStatus.CREATED)
+                            .statusCode(HttpStatus.CREATED.value())
+                            .userDataSet(Set.of(vaud))
+                            .timestamp(LocalDateTime.now())
+                            .build()
+            );
+        } else {
+            appUserValidatorService.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
 
-	//@PreAuthorize("hasAuthority('appuser:read')")
-	@GetMapping("/{uid}")
-	public AppUserResponse getUser(@PathVariable String uid){
-    	//Validate the Uid provided
-		if(appUserService.validateUid(uid)) {
-			//Return appUser if any
-			AppUserDTO udto = appUserService.getUser(uid);
-			//Handle error if any
-			if (udto == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found; Valid UID but User account may have been deleted ");
-			//Create return type
-			AppUserResponse appAppUserResponse = new AppUserResponse();
-			BeanUtils.copyProperties(udto, appAppUserResponse);
-			return appAppUserResponse;
-		}
-		else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
-	}
+            return ResponseEntity.ok(
+                    //Return ResponseEntity containing the errors
+                    AppUserResponse.builder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .errors(errors)
+                            .timestamp(LocalDateTime.now())
+                            .build()
+            );
+        }
 
-	@PostMapping("/register")
-	public AppUserResponse createUser(@RequestBody AppUserRequest request){
-    	//Create a DTO
-		AppUserDTO udto = new AppUserDTO();
-		BeanUtils.copyProperties(request,udto);
+    }
 
-    	//Validate and purify input using the UserValidator Component
-		appUserValidatorService.setDto(udto);
-		udto= appUserValidatorService.cleanObject();
-		LinkedHashMap<String, String> errors = appUserValidatorService.validate();
+    @PreAuthorize("hasAuthority('appuser:write')")
+    @DeleteMapping("/{uid}")
+    public ResponseEntity<AppUserResponse> deleteUser(@PathVariable String uid) {
+        //validate uid
+        if (appUserValidatorService.validateUid(uid)) {
+            //Return appUser if any
+            Boolean response = appUserService.deleteUser(uid);
+            //Handle error if any
+            if (response) {
+                return ResponseEntity.ok(
+                        AppUserResponse.builder()
+                                .status(HttpStatus.OK)
+                                .statusCode(HttpStatus.OK.value())
+                                .message("User " + uid + " deleted successfully")
+                                .timestamp(LocalDateTime.now())
+                                .build()
+                );
+            }
+            else throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User not Found; Valid UID but User account may have been deleted ");
+        }
+        else throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Invalid UID");
 
-		//Create an object of the return type
-		AppUserResponse appAppUserResponse = new AppUserResponse();
-		//Handle errors if any
-		if(errors.isEmpty()) {
-			udto = appUserService.createUser(udto);
-			BeanUtils.copyProperties(udto, appAppUserResponse);
-		}
-		else	{
-			appAppUserResponse.setErrors(errors);
-			appUserValidatorService.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
-		}
+    }
 
-		return appAppUserResponse;
-	}
+    @PreAuthorize("hasAuthority('appuser:write')")
+    @PutMapping("/{uid}")
+    public ResponseEntity<AppUserResponse> updateUser(@PathVariable String uid, @RequestBody AppUserRequest request) {
+        //Validate Uid
+        if (appUserValidatorService.validateUid(uid)) {
+            AppUserDTO udto = new AppUserDTO();
+            BeanUtils.copyProperties(request, udto);
 
-	//@PreAuthorize("hasAuthority('appuser:write')")
-	@DeleteMapping("/{uid}")
-	public String deleteUser(@PathVariable String uid){
-    	//validate uid
-		if (appUserService.validateUid(uid)) {
-			//Return appUser if any
-			Boolean response = appUserService.deleteUser(uid);
-			//Handle error if any
-			if (response)
-				return "User ".concat(uid).concat(" deleted successfully");
-		}
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
-	}
+            //Validate and purify input using the UserValidator Component
+            appUserValidatorService.setPost(false);//Identifies a PUT operation using 'false' as POST status
+            appUserValidatorService.setDto(udto);//Sets the request dto
+            udto = appUserValidatorService.cleanObject();
+            LinkedHashMap<String, String> errors = appUserValidatorService.validate();
 
-	//@PreAuthorize("hasAuthority('appuser:write')")
-	@PutMapping("/{uid}")
-	public AppUserResponse updateUser(@PathVariable String uid, @RequestBody AppUserRequest request) {
-		//Validate Uid
-		if (appUserService.validateUid(uid)) {
-			AppUserDTO udtoRequest = new AppUserDTO();
-			BeanUtils.copyProperties(request, udtoRequest);
+            return userOrError(errors, udto, uid);
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
+    }
 
-			//Validate and purify input using the UserValidator Component
-			appUserValidatorService.setPost(false);//Identifies a PUT operation using 'false' as POST status
-			appUserValidatorService.setDto(udtoRequest);//Sets the request dto
-			udtoRequest = appUserValidatorService.cleanObject();
-			LinkedHashMap<String, String> errors = appUserValidatorService.validate();
+    private ResponseEntity<AppUserResponse> userOrError(LinkedHashMap<String, String> errors, AppUserDTO udto, String uid) {
 
-			//Create an object of the return type
-			AppUserResponse appAppUserResponse = new AppUserResponse();
-			//Handle errors if any
-			if (errors.isEmpty()) {
-				//Identify the DTO object
-				udtoRequest.setAppUserUid(uid);
-				//Update user, reuse udtoRequest
-				udtoRequest = appUserService.updateUser(udtoRequest);
+        //Handle errors if any
+        if (errors.isEmpty()) {
+            //Identify the DTO object
+            udto.setAppUserUid(uid);
+            //Update user, reuse udto
+            udto = appUserService.updateUser(udto);
 
-				//If appUser with appUserId exists in database
-				if (udtoRequest != null) {
-					BeanUtils.copyProperties(udtoRequest, appAppUserResponse);
-					}
-				else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found; Valid UID but User account may have been deleted ");
-				}
-			else {
-				appAppUserResponse.setErrors(errors);
-				appUserValidatorService.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
-			}
-			return appAppUserResponse;
-		}
-		else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
-	}
-	}
-
+            //If appUser with appUserId exists in database
+            if (udto != null) {
+                // Instance of VisibleAppUserData, not all details should be exposed to the client
+                AppUserResponse.VisibleAppUserData vaud = AppUserResponse.getVisibleAppUserDataInstance();
+                BeanUtils.copyProperties(udto,vaud);
+                return ResponseEntity.ok(
+                        //Return ResponseEntity containing the user
+                        AppUserResponse.builder()
+                                .status(HttpStatus.OK)
+                                .statusCode(HttpStatus.OK.value())
+                                .userDataSet(Set.of(vaud))
+                                .timestamp(LocalDateTime.now())
+                                .build()
+                );
+            } else
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found; Valid UID but User account may have been deleted ");
+        } else {
+            appUserValidatorService.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
+            return ResponseEntity.ok(
+                    //Return ResponseEntity containing the errors
+                    AppUserResponse.builder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .timestamp(LocalDateTime.now())
+                            .errors(errors)
+                            .build()
+            );
+        }
+    }
+}

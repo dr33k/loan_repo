@@ -9,19 +9,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class TemplateController  {
 
     @GetMapping()
-    public String getHomePage() {
-        return "home";
-    }
-
-    @GetMapping("login")
-    public String getLoginPage() {
+    public String getHomeView() {
         return "login";
     }
 
+    @GetMapping("login")
+    public String getLogin() {
+        return "login";
+    }
+    @GetMapping("dashboard")
+    public String getDashboard(){
+        return "dashboard";
+    }
+
     @GetMapping("invalid_session")
-    public String getInvalidSessionPage(){
+    public String getInvalidSession(){
         return "invalid_session";
     }
+
+    @GetMapping("failed")
+    public String getFailed(){return "fail";}
 }
 
 

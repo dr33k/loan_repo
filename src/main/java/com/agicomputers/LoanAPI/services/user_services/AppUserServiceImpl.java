@@ -1,17 +1,21 @@
 package com.agicomputers.LoanAPI.services.user_services;
 
 import com.agicomputers.LoanAPI.models.entities.AppUser;
+import com.agicomputers.LoanAPI.repositories.user_repositories.AppUserRepository;
 import com.agicomputers.LoanAPI.repositories.user_repositories.AuthenticatedUserRepository;
-import com.agicomputers.LoanAPI.repositories.user_repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.agicomputers.LoanAPI.models.dto.user_dtos.AppUserDTO;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -21,25 +25,24 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
+@Transactional
+@Slf4j
+@RequiredArgsConstructor
 public class AppUserServiceImpl implements UserService, UserDetailsService {
 
-    UserRepository appUserRepository;
-    PasswordEncoder passwordEncoder;
-    AuthenticatedUserRepository authenticatedUserRepository;
-
     @Autowired
-    public AppUserServiceImpl(@Qualifier("appUserRepository1") UserRepository appUserRepository,
-                                   PasswordEncoder passwordEncoder,
-                                   AuthenticatedUserRepository authenticatedUserRepository) {
-        this.appUserRepository = appUserRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticatedUserRepository=  authenticatedUserRepository;
-    }
+    @Qualifier("appUserRepository1")
+    private final AppUserRepository appUserRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private final AuthenticatedUserRepository authenticatedUserRepository;
 
     @Override
     public HashSet<AppUserDTO> getAllUsers() {
+        log.info("______________________Getting all app users_______________________");
         Set<AppUserDTO> appUsers = new HashSet<AppUserDTO>(0);
-        Iterable<AppUser> appUsersFromRepo = appUserRepository.findAll();
+        Iterable<AppUser> appUsersFromRepo = appUserRepository.findAll(PageRequest.of(0, 20));
 
         AppUserDTO udto;
         Iterator<AppUser> iterator = appUsersFromRepo.iterator();
@@ -53,55 +56,58 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public AppUserDTO getUser(String appUserUid) {
-        //Extract Database Id for quicker indexed search
+        log.info("______________________Getting app user: " + appUserUid + "  ________________________");
         try {
-        //Use the AppUserRepository to find by appUserUid
-       Optional<AppUser> optionalAppUser = appUserRepository.findByAppUserUid(appUserUid);
-      if (optionalAppUser.isPresent()) {
-            AppUser appUser = optionalAppUser.get();
-            AppUserDTO udto = new AppUserDTO();
-            BeanUtils.copyProperties(appUser, udto);
-            return udto;
-        }
+            //Use the AppUserRepository to find by appUserUid
+            Optional<AppUser> optionalAppUser = appUserRepository.findByAppUserUid(appUserUid);
+            if (optionalAppUser.isPresent()) {
+                AppUser appUser = optionalAppUser.get();
+                AppUserDTO udto = new AppUserDTO();
+                BeanUtils.copyProperties(appUser, udto);
+                return udto;
+            }
 
-      }catch (Exception ex){
+        } catch (Exception ex) {
             return null;
         }
-      return null;
+        return null;
     }
 
     @Override
     public AppUserDTO getUserWithEmail(String email) {
-        Optional<AppUser> appUserWithEmail = appUserRepository.findByEmail(email);
-        if (appUserWithEmail.isPresent()){
+        Optional<AppUser> appUserWithEmail = appUserRepository.findByAppUserEmail(email);
+        if (appUserWithEmail.isPresent()) {
             AppUser appUser = appUserWithEmail.get();
             AppUserDTO udto = new AppUserDTO();
-            BeanUtils.copyProperties(appUser,udto);
+            BeanUtils.copyProperties(appUser, udto);
             return udto;
-        }
-        else return null;
+        } else return null;
     }
 
     @Override
-    public Boolean deleteUser(String appUserId) {
+    public Boolean deleteUser(String appUserUid) {
+        log.info("______________________Deleting app user: {} ________________________", appUserUid);
         try {
-            Optional<Long> idOptional = appUserRepository.existsByAppUserUid(appUserId);
+            Optional<Long> idOptional = appUserRepository.existsByAppUserUid(appUserUid);
             if (idOptional.isPresent()) {
                 appUserRepository.deleteById(idOptional.get());
                 return true;
             }
-        }catch (Exception ex){return false;}
+        } catch (Exception ex) {
+            return false;
+        }
         return false;
     }
 
     @Override
-    @Transactional
     public AppUserDTO createUser(AppUserDTO udto) {
+        log.info("____________________Creating app user________________________");
+
         AppUser appUser = new AppUser(); //AppUser Entity
         BeanUtils.copyProperties(udto, appUser);
 
         //Set AppUser's  encoded password
-        appUser.setAppUserPassphrase(passwordEncoder.encode(udto.getAppUserPassphrase()));
+        appUser.setAppUserPassword(passwordEncoder.encode(udto.getAppUserPassword()));
 
         //Get AppUser's custom generated Uid
         String generatedAppUserUid = generateAppUserUid(udto.getAppUserEmail());
@@ -113,46 +119,52 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
 
         //Copy properties into the DTO
         BeanUtils.copyProperties(appUser, udto);
+        ServletUriComponentsBuilder.fromCurrentContextPath().path("/app_user/image/" + udto.getAppUserPassportPhoto());
         return udto;
     }
 
     @Override
-    @Transactional
     public AppUserDTO updateUser(AppUserDTO udto) {
+        log.info("______________________Updating app user:{} __________________________", udto.getAppUserUid());
+
         try {
 
-        Optional<AppUser> appUserOptional = appUserRepository.findByAppUserUid(udto.getAppUserUid());
-        if(appUserOptional.isPresent()) {
-            AppUser appUser = appUserOptional.get();
-            if(udto.getAppUserFname() != null)appUser.setAppUserFname(udto.getAppUserFname());
-            if(udto.getAppUserLname() != null)appUser.setAppUserLname(udto.getAppUserLname());
-            if(udto.getAppUserPhone1() != null)appUser.setAppUserPhone1(udto.getAppUserPhone1());
-            if(udto.getAppUserPhone2() != null)appUser.setAppUserPhone2(udto.getAppUserPhone2());
-            if(udto.getAppUserEmail() != null)appUser.setAppUserEmail(udto.getAppUserEmail());
-            if(udto.getAppUserPassphrase() != null)appUser.setAppUserPassphrase(udto.getAppUserPassphrase());
-            if(udto.getAppUserPassportPhoto() != null)appUser.setAppUserPassportPhoto(udto.getAppUserPassportPhoto());
-            if(udto.getAppUserNIN() != null)appUser.setAppUserNIN(udto.getAppUserNIN());
-            if(udto.getAppUserBVN() != null)appUser.setAppUserBVN(udto.getAppUserBVN());
-            if(udto.getAppUserAddress() != null)appUser.setAppUserAddress(udto.getAppUserAddress());
-            if(udto.getAppUserOccupation() != null)appUser.setAppUserOccupation(udto.getAppUserOccupation());
-            if(udto.getAppUserOccupationLocation() != null)appUser.setAppUserOccupationLocation(udto.getAppUserOccupationLocation());
+            Optional<AppUser> appUserOptional = appUserRepository.findByAppUserUid(udto.getAppUserUid());
+            if (appUserOptional.isPresent()) {
+                AppUser appUser = appUserOptional.get();
 
-            appUserRepository.save(appUser);
+                if (udto.getAppUserFname() != null) appUser.setAppUserFname(udto.getAppUserFname());
+                if (udto.getAppUserLname() != null) appUser.setAppUserLname(udto.getAppUserLname());
+                if (udto.getAppUserPhone1() != null) appUser.setAppUserPhone1(udto.getAppUserPhone1());
+                if (udto.getAppUserPhone2() != null) appUser.setAppUserPhone2(udto.getAppUserPhone2());
+                if (udto.getAppUserEmail() != null) appUser.setAppUserEmail(udto.getAppUserEmail());
+                if (udto.getAppUserPassword() != null) appUser.setAppUserPassword(udto.getAppUserPassword());
+                if (udto.getAppUserPassportPhoto() != null)
+                    appUser.setAppUserPassportPhoto(udto.getAppUserPassportPhoto());
+                if (udto.getAppUserNIN() != null) appUser.setAppUserNIN(udto.getAppUserNIN());
+                if (udto.getAppUserBVN() != null) appUser.setAppUserBVN(udto.getAppUserBVN());
+                if (udto.getAppUserAddress() != null) appUser.setAppUserAddress(udto.getAppUserAddress());
+                if (udto.getAppUserOccupation() != null) appUser.setAppUserOccupation(udto.getAppUserOccupation());
+                if (udto.getAppUserOccupationLocation() != null)
+                    appUser.setAppUserOccupationLocation(udto.getAppUserOccupationLocation());
 
-            BeanUtils.copyProperties(appUser,udto);
-            return udto;
+                appUserRepository.save(appUser);
+
+                BeanUtils.copyProperties(appUser, udto);
+                return udto;
+            }
+        } catch (Exception ex) {
+            return null;
         }
-        }
-        catch (Exception ex){ return  null;  }
 
         return null;
     }
 
 
-    private String allLetters(String checksumBase36Encode){
+    private String allLetters(String checksumBase36Encode) {
         //Check for the non-letter/number
-        for(int i = 0; i<checksumBase36Encode.length();i++){
-            if(!Character.isLetter(checksumBase36Encode.charAt(i))) {
+        for (int i = 0; i < checksumBase36Encode.length(); i++) {
+            if (!Character.isLetter(checksumBase36Encode.charAt(i))) {
                 int number = Integer.parseInt(Character.toString(checksumBase36Encode.charAt(i)));
                 int codePoint = number + 97; //This randomly returns a codepoint between "a" and "j", j inclusive
                 char[] chars = Character.toChars(codePoint);
@@ -161,6 +173,7 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
         }
         return checksumBase36Encode;
     }
+
     private String generateAppUserUid(String email) {
 
         if (email.matches(".+@.+\\..{2,}")) {
@@ -184,41 +197,20 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
             String newId = idfirst10Bytes.concat(checksumLast5Bytes);
 
             return newId;
-        }else return null;
+        } else return null;
     }
 
-    public boolean validateUid(String uid){
-        if(!uid.matches("^[0-9]{10}[A-Z]{5}$")){return false; }
-
-        String first10Bytes = uid.substring(0,10);
-        //Last 5 bytes decapitalized for processing
-        String last5Bytes = decapitalize(uid.substring(10));
-
-        String checksumLast5Bytes = generateChecksum(first10Bytes);
-
-        return last5Bytes.equals(checksumLast5Bytes);
-    }
-
-    private String capitalize(String word){
+    private String capitalize(String word) {
         char character;
-        for(int i = 0;i<word.length();i++) {
+        for (int i = 0; i < word.length(); i++) {
             character = word.charAt(i);
-            if(Character.isLetter(character)&& Character.isLowerCase(character))
-                word = word.replace(word.charAt(i),Character.toUpperCase(character));
+            if (Character.isLetter(character) && Character.isLowerCase(character))
+                word = word.replace(word.charAt(i), Character.toUpperCase(character));
         }
         return word;
     }
 
-    private String decapitalize(String word){
-        for(int i = 0;i<word.length();i++) {
-            char character = word.charAt(i);
-            if(Character.isLetter(character)&& Character.isUpperCase(character))
-                word = word.replace(character,Character.toLowerCase(character));
-        }
-        return word;
-    }
-
-    private String generateChecksum(String data){
+    public String generateChecksum(String data) {
 
         //Generate a checksum
         CRC32 checksum = new CRC32();
@@ -233,7 +225,7 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
     }
 
     //172ms 230ms
-    public long nextId(){
+    public long nextId() {
         long count;
         try {
             count = appUserRepository.findNextAppUserId();//This returns the next id in the sequence generator
@@ -250,7 +242,7 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return authenticatedUserRepository.getAuthenticatedUser(username)
-                .orElseThrow(()->new UsernameNotFoundException(String.format("Username %s not found",username)));
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("Username %s not found", username)));
 
     }
 }

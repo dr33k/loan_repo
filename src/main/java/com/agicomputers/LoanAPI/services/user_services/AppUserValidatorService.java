@@ -3,19 +3,30 @@ package com.agicomputers.LoanAPI.services.user_services;
 
 import com.agicomputers.LoanAPI.repositories.user_repositories.AppUserRepository;
 import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.agicomputers.LoanAPI.models.dto.user_dtos.AppUserDTO;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.TemporalAmount;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.io.File;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AppUserValidatorService{
     final String NAME_LEN = "\nName should not be less than two characters";
     final String NAME_SP = "\nSpecial characters not permitted in this field";
     final String EMAIL_FMT = "\nIncorrect email format";
+    final String DOB_FMT = "\nIncorrect DOB format";
+    final String DOB_FMT_YMD = "\nIncorrect DOB format, only YYYY-MM-DD supported";
+    final String DOB_18 = "\nYou must be 18 years or older";
     final String EMAIL_EX = "\nThis email already exists";
     final String PHONE_FMT = "\nIncorrect phone number format";
     final String ADDRESS = "\nPlease provide a valid input greater than 10 characters";
@@ -31,9 +42,9 @@ public class AppUserValidatorService{
     final String PHOTO_EX = "\nPhoto does not exist";
 
     @Autowired
-    AppUserServiceImpl appUserService;
+    private final AppUserServiceImpl appUserService;
     @Autowired
-    AppUserRepository appUserRepository;
+    private final AppUserRepository appUserRepository;
 
     AppUserDTO dto = null;
     LinkedHashMap<String, String> errors = new LinkedHashMap<>(0);
@@ -75,12 +86,24 @@ public class AppUserValidatorService{
         }
         catch(NullPointerException nullEx){errors.put(propertyName, NAME_LEN);}
     }
-    
-    
+
+    public void validateDob(LocalDate userDob){
+        try {
+        LocalDate now = LocalDate.now();
+        Period userAge =  userDob.until(now);
+
+            if (userDob.getYear() < 1900 || userDob.getYear() > now.getYear()) errors.put("DOB_YEAR: ", DOB_FMT_YMD);
+            else if (userDob.getMonthValue() < 1 || userDob.getMonthValue() > 12) errors.put("DOB_MONTH: ", DOB_FMT_YMD);
+            else if (userDob.getDayOfMonth()< 1 || userDob.getDayOfMonth() > userDob.lengthOfMonth()) errors.put("DOB_DAY: ", DOB_FMT_YMD);
+            else if (userAge.getYears()< 18) errors.put("DOB: ", DOB_18);
+        }
+        catch(NullPointerException nullEx){errors.put("DOB: ", DOB_FMT);}
+        catch(Exception e){errors.put("DOB: ",DOB_FMT_YMD);}
+    }
     public void validateEmail(String email){
         try {
             if (!email.matches(".+@.+\\..{2,}")) errors.put("Email: ", EMAIL_FMT);
-            if (emailExists(email)) errors.put("Email: ", EMAIL_EX);
+            else if (emailExists(email)) errors.put("Email: ", EMAIL_EX);
         }
         catch(NullPointerException nullEx){errors.put("Email: ", EMAIL_FMT);}
     }
@@ -97,7 +120,7 @@ public class AppUserValidatorService{
     public void validateNIN(String nin){
         try {
             if (!nin.matches("^[0-9]{11}$")) errors.put("NIN: ", NIN);
-            if (ninExists(nin)) errors.put("Email: ", NIN_EX);
+            else if (ninExists(nin)) errors.put("NIN: ", NIN_EX);
         }
         catch(NullPointerException nullEx) { errors.put("NIN: ", NIN);};
     }
@@ -105,20 +128,20 @@ public class AppUserValidatorService{
     public void validateBVN(String bvn){
         try {
             if (!bvn.matches("^[0-9]{10}$")) errors.put("BVN: ", BVN);
-            if (bvnExists(bvn)) errors.put("BVN: ", BVN_EX);
+            else if (bvnExists(bvn)) errors.put("BVN: ", BVN_EX);
         }
         catch(NullPointerException nullEx) { errors.put("BVN: ", BVN);};
     }
 
-    public void validatePassphrase(String passphrase){
+    public void validatePassword(String password){
         try {
-            if (passphrase.length() < 8) errors.put("Passphrase: ", PPHRASE_LEN);
-            else if (!passphrase.matches(".*[A-Z]+.*")  //There is no uppercase Letter
-                    || !passphrase.matches(".*[a-z]+.*")// There is no lowercase letter
-                    || !passphrase.matches(".*[0-9]+.*")// There is no number
-                    || !passphrase.matches(".*[!#$%\\^*()+=|{}\\\"\\\\;:/?,.'<>`~\\-\\[\\]]+.*"))//There is no special character
-                errors.put("Passphrase: ", PPHRASE_OTHERS);
-        } catch(NullPointerException nullEx) { errors.put("Passphrase: ", PPHRASE_LEN);}
+            if (password.length() < 8) errors.put("Password: ", PPHRASE_LEN);
+            else if (!password.matches(".*[A-Z]+.*")  //There is no uppercase Letter
+                    || !password.matches(".*[a-z]+.*")// There is no lowercase letter
+                    || !password.matches(".*[0-9]+.*")// There is no number
+                    || !password.matches(".*[!#$%\\^*()+=|{}\\\"\\\\;:/?,.'<>`~\\-\\[\\]]+.*"))//There is no special character
+                errors.put("Password: ", PPHRASE_OTHERS);
+        } catch(NullPointerException nullEx) { errors.put("Password: ", PPHRASE_LEN);}
     }
 
     //This method validates addresses or other textbox inputs
@@ -209,7 +232,8 @@ public class AppUserValidatorService{
             validatePhone("Phone No. 1: ", dto.getAppUserPhone1());
             validatePhone("Phone No. 2: ", dto.getAppUserPhone2());
             validateEmail(dto.getAppUserEmail());
-            validatePassphrase(dto.getAppUserPassphrase());
+            validateDob(dto.getAppUserDob());
+            validatePassword(dto.getAppUserPassword());
             validatePhoto(dto.getAppUserPassportPhoto());
             validateNIN(dto.getAppUserNIN());
             validateBVN(dto.getAppUserBVN());
@@ -223,7 +247,8 @@ public class AppUserValidatorService{
             if(dto.getAppUserPhone1()!=null)validatePhone("Phone No. 1: ", dto.getAppUserPhone1());
             if(dto.getAppUserPhone2()!=null)validatePhone("Phone No. 2: ", dto.getAppUserPhone2());
             if(dto.getAppUserEmail()!=null)validateEmail(dto.getAppUserEmail());
-            if(dto.getAppUserPassphrase()!=null)validatePassphrase(dto.getAppUserPassphrase());
+            if(dto.getAppUserDob()!=null)validateDob(dto.getAppUserDob());
+            if(dto.getAppUserPassword()!=null)validatePassword(dto.getAppUserPassword());
             if(dto.getAppUserPassportPhoto()!=null)validatePhoto(dto.getAppUserPassportPhoto());
             if(dto.getAppUserNIN()!=null)validateNIN(dto.getAppUserNIN());
             if(dto.getAppUserBVN()!=null)validateBVN(dto.getAppUserBVN());
@@ -232,6 +257,28 @@ public class AppUserValidatorService{
         }
         return errors;
     }
+
+    public boolean validateUid(String uid){
+        if(!uid.matches("^[0-9]{10}[A-Z]{5}$")){return false; }
+
+        String first10Bytes = uid.substring(0,10);
+        //Last 5 bytes decapitalized for processing
+        String last5Bytes = decapitalize(uid.substring(10));
+
+        String checksumLast5Bytes = appUserService.generateChecksum(first10Bytes);
+
+        return last5Bytes.equals(checksumLast5Bytes);
+    }
+
+    private String decapitalize(String word){
+        for(int i = 0;i<word.length();i++) {
+            char character = word.charAt(i);
+            if(Character.isLetter(character)&& Character.isUpperCase(character))
+                word = word.replace(character,Character.toLowerCase(character));
+        }
+        return word;
+    }
+
 
     private Boolean emailExists(String email) {
         Optional<Long> idWithEmail = appUserRepository.existsByEmail(email);   //Id gotten with the email as a search key

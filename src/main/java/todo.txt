@@ -1,2 +1,2 @@
-validate DOB
-Make sure user cant update values with same information
+validate Occupation
+Update Endpoints

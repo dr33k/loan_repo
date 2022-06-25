@@ -1,6 +1,9 @@
 package com.agicomputers.LoanAPI.models.entities;
 
 import com.agicomputers.LoanAPI.models.enums.AppUserPermission;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,11 +16,14 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name="role")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Integer role_id;
+    private Integer roleId;
 
     @Column(nullable = false)
     private String roleName;
@@ -32,7 +38,7 @@ public class Role {
     private String roleDescription;
 
     public Role(Integer id, String roleName, Set<? extends GrantedAuthority> authorities) {
-        this.role_id = id;
+        this.roleId = id;
         this.roleName = roleName;
 
 //map Set<? extends GrantedAuthorities> into List<String>, add the ROLE and then assign to roleAuthorities
@@ -46,7 +52,7 @@ public class Role {
         this.roleAuthorities = temp.toArray(this.roleAuthorities);
 
     }
-
+/*
     public Integer getId() {
         return this.role_id;
     }
@@ -67,16 +73,7 @@ public class Role {
         return roleAuthorities;
     }
 
-    public void setRoleAuthorities(String... roleAuthorities) {
-        String[] stringRoleAuthorities= {};
-        //Add the "ROLE" authority
-        Set<String> stringRoleAuthoritiesSet = Set.of(roleAuthorities);
-        if(!stringRoleAuthoritiesSet.contains("ROLE_" + roleName.toUpperCase()))
-            stringRoleAuthoritiesSet.add("ROLE_" + roleName.toUpperCase());
-        stringRoleAuthorities = stringRoleAuthoritiesSet.toArray(stringRoleAuthorities);
 
-        this.roleAuthorities = stringRoleAuthorities;
-    }
 
     public void setRoleAuthorities(Set<GrantedAuthority> authorities) {
         //Add the "ROLE" authority
@@ -99,6 +96,18 @@ public class Role {
 
     public void setRoleDescription(String roleDescription) {
         this.roleDescription = roleDescription;
+    }
+    */
+
+    public void setRoleAuthorities(String... roleAuthorities) {
+        String[] stringRoleAuthorities= {};
+        //Add the "ROLE" authority
+        Set<String> stringRoleAuthoritiesSet = Set.of(roleAuthorities);
+        if(!stringRoleAuthoritiesSet.contains("ROLE_" + roleName.toUpperCase()))
+            stringRoleAuthoritiesSet.add("ROLE_" + roleName.toUpperCase());
+        stringRoleAuthorities = stringRoleAuthoritiesSet.toArray(stringRoleAuthorities);
+
+        this.roleAuthorities = stringRoleAuthorities;
     }
 
 }

@@ -3,6 +3,7 @@ package com.agicomputers.LoanAPI.security;
 import com.agicomputers.LoanAPI.models.enums.AppUserPermission;
 import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -33,42 +34,39 @@ import io.jsonwebtoken.Jwts;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
    private final PasswordEncoder passwordEncoder;
    private final AppUserServiceImpl appUserService;
 
-    @Autowired
-    public AppSecurityConfig( PasswordEncoder passwordEncoder,
-                              AppUserServiceImpl appUserService){
-        this.passwordEncoder = passwordEncoder;
-        this.appUserService = appUserService;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrf().disable()
+              // .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 
-                .and()
+                //.and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .invalidSessionUrl("/invalid_session")
 
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST,"/app_user/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
                 .formLogin()
-                .loginPage("/login")
+                .loginPage("/login").permitAll()
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/home")
+                .defaultSuccessUrl("/dashboard",true)
+                .failureUrl("/failed")
+
 
 
                 .and()

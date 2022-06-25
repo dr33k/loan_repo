@@ -41,3 +41,9 @@
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID","remember-me")
                 .logoutSuccessUrl("/login");
+
+
+        public ResponseEntity<Response> getSeervers(){
+        return ResponseEntity.ok()
+        Response.
+        }
