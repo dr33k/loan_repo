@@ -1,4 +1,5 @@
 package com.agicomputers.LoanAPI.models.request;
+import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import com.agicomputers.LoanAPI.models.enums.UserOccupation;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,6 +22,7 @@ public class AppUserRequest{
     private String appUserPhone1;
     private String appUserPhone2;
     private String appUserAddress;
+    private AppUserRole appUserRole = AppUserRole.APPUSER;
     private String appUserPassword;
     private String appUserNIN;
     private String appUserBVN;

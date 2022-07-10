@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.agicomputers.LoanAPI.models.dto.user_dtos.AppUserDTO;
+import com.agicomputers.LoanAPI.models.dto.AppUserDTO;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
@@ -30,11 +30,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AppUserServiceImpl implements UserService, UserDetailsService {
 
-    @Autowired
     @Qualifier("appUserRepository1")
+    @Autowired
     private final AppUserRepository appUserRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private final AuthenticatedUserRepository authenticatedUserRepository;
 

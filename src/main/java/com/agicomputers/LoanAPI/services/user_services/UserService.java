@@ -1,7 +1,7 @@
 package com.agicomputers.LoanAPI.services.user_services;
 
 import java.util.HashSet;
-import com.agicomputers.LoanAPI.models.dto.user_dtos.AppUserDTO;
+import com.agicomputers.LoanAPI.models.dto.AppUserDTO;
 
 public interface UserService {
 

@@ -1,36 +1,22 @@
 package com.agicomputers.LoanAPI.security;
 
-import com.agicomputers.LoanAPI.models.enums.AppUserPermission;
-import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 
 import java.util.concurrent.TimeUnit;
-import io.jsonwebtoken.security.Keys;
-import java.security.Key;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.Jwts;
+
 
 @Configuration
 @EnableWebSecurity
@@ -55,8 +41,9 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers(HttpMethod.POST,"/app_user/**").permitAll()
+                .antMatchers("/","/register").permitAll()
+                .antMatchers("/app_user/**").hasAnyAuthority("appuser:read","appuser:write")
+                .antMatchers("/administrator/**").hasAnyRole("ADMIN","SUBADMIN")
                 .anyRequest().authenticated()
 
                 .and()

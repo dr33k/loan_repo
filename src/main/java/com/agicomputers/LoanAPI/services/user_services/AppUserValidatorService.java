@@ -2,18 +2,13 @@
 package com.agicomputers.LoanAPI.services.user_services;
 
 import com.agicomputers.LoanAPI.repositories.user_repositories.AppUserRepository;
-import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.agicomputers.LoanAPI.models.dto.user_dtos.AppUserDTO;
+import com.agicomputers.LoanAPI.models.dto.AppUserDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
-import java.time.temporal.TemporalAmount;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.io.File;
 import java.util.Optional;
@@ -139,7 +134,7 @@ public class AppUserValidatorService{
             else if (!password.matches(".*[A-Z]+.*")  //There is no uppercase Letter
                     || !password.matches(".*[a-z]+.*")// There is no lowercase letter
                     || !password.matches(".*[0-9]+.*")// There is no number
-                    || !password.matches(".*[!#$%\\^*()+=|{}\\\"\\\\;:/?,.'<>`~\\-\\[\\]]+.*"))//There is no special character
+                    || !password.matches(".*[!#&@$%\\^*()+=|{}\\\"\\\\;:/?,.'<>`~\\-\\[\\]]+.*"))//There is no special character
                 errors.put("Password: ", PPHRASE_OTHERS);
         } catch(NullPointerException nullEx) { errors.put("Password: ", PPHRASE_LEN);}
     }
@@ -148,7 +143,6 @@ public class AppUserValidatorService{
     
     public void validateText(String propertyName, String propertyValue){
         try {
-            String valueErrors = "";
             String value = propertyValue;
             if (value.length() < 10) errors.put(propertyName, ADDRESS);
         }catch(NullPointerException nullEx) {errors.put(propertyName, ADDRESS);};

@@ -1,5 +1,6 @@
-package com.agicomputers.LoanAPI.models.dto.user_dtos;
+package com.agicomputers.LoanAPI.models.dto;
 import com.agicomputers.LoanAPI.models.entities.Role;
+import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import com.agicomputers.LoanAPI.models.enums.UserOccupation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -15,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AppUserDTO{
+public class AppUserDTO implements DTO{
     private long appUserId;
     private String appUserUid;//Username
     private String appUserFname;
@@ -32,7 +33,8 @@ public class AppUserDTO{
 
     private String appUserPassportPhoto;
     private String appUserNINPhoto;
-    private Role appUserRole;
+    private Role role;
+    private AppUserRole appUserRole;
     private UserOccupation appUserOccupation;
     private String appUserOccupationLocation;
     private Boolean appUserRewarded = false;

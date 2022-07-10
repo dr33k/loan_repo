@@ -1,6 +1,5 @@
 package com.agicomputers.LoanAPI.models.response;
 
-import com.agicomputers.LoanAPI.models.dto.user_dtos.AppUserDTO;
 import com.agicomputers.LoanAPI.models.entities.Role;
 import com.agicomputers.LoanAPI.models.enums.UserOccupation;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.http.HttpStatus;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
