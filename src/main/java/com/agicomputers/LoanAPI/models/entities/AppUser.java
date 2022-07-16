@@ -1,6 +1,7 @@
 package com.agicomputers.LoanAPI.models.entities;
 
 import com.agicomputers.LoanAPI.models.enums.UserOccupation;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,15 +9,18 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.sql.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "app_user")
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class AppUser implements UserDetails {
     @Id
@@ -30,20 +34,20 @@ public class AppUser implements UserDetails {
     private String appUserUid;          //UID
 
     @Column( nullable = false)
-    private String appUserFname; //app_user_fname
+    private String appUserFname;
 
     @Column(nullable = false)
     private String appUserLname;
     
     @ManyToOne
     @JoinColumn(name="role_id",referencedColumnName = "roleId")
-    private Role appUserRole;
+    private Role role;
 
     @Column(nullable = false)
-    private LocalDate appUserDob;
+    private Date appUserDob;
 
     @Column(nullable = false)
-    private LocalDateTime appUserDor = LocalDateTime.now();
+    private Timestamp appUserDor;
 
     @Column(nullable = false, unique = true)
     private String appUserEmail;
@@ -100,7 +104,7 @@ public class AppUser implements UserDetails {
 
     public AppUser(String appUserUid, String appUserPassword, Role appUserRole) {
         this.appUserUid = appUserUid;
-        this.appUserRole = appUserRole;
+        this.role = appUserRole;
         this.appUserPassword = appUserPassword;
     }
 
@@ -144,16 +148,16 @@ public class AppUser implements UserDetails {
         isEnabled = enabled;
     }
 
-    public void setAuthorities(String... authorities){
-        appUserRole.setRoleAuthorities(authorities);
+    public void setAuthorities(String[] authorities){
+        role.setRoleAuthoritiesArray(authorities);
     }
-
-    @Override
+      @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<SimpleGrantedAuthority> authorities = Set.of(appUserRole.getRoleAuthorities())
-                .stream()
+        Set<SimpleGrantedAuthority> authorities = Arrays.stream(role.getRoleAuthoritiesArray())
                 .map((authority)->{return new SimpleGrantedAuthority(authority);})
                 .collect(Collectors.toSet());
-        return authorities;    }
+        authorities.add(new SimpleGrantedAuthority("ROLE_"+this.role.getRoleName()));
+        return authorities;
+    }
 
 }

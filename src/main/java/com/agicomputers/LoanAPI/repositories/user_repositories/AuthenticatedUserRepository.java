@@ -1,4 +1,4 @@
-package com.agicomputers.LoanAPI.repositories.user_repositories;
+/*package com.agicomputers.LoanAPI.repositories.user_repositories;
 
 import com.agicomputers.LoanAPI.models.entities.AppUser;
 import com.agicomputers.LoanAPI.models.entities.Role;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
-@Repository
+
 @RequiredArgsConstructor
 public class AuthenticatedUserRepository {
 
@@ -40,3 +40,4 @@ public class AuthenticatedUserRepository {
     }
 
 }
+*/

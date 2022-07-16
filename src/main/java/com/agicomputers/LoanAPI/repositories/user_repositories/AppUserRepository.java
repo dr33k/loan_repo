@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository("appUserRepository1")
 public interface AppUserRepository extends JpaRepository<AppUser,Long> {
 
+    @Query("FROM AppUser AU WHERE AU.appUserUid=?1")
     Optional<AppUser> findByAppUserUid(String appUserUid);
 
     Optional<AppUser> findByAppUserEmail(String email);

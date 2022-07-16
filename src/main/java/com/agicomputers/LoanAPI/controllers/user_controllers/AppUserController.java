@@ -2,6 +2,7 @@ package com.agicomputers.LoanAPI.controllers.user_controllers;
 
 import com.agicomputers.LoanAPI.models.request.AppUserRequest;
 import com.agicomputers.LoanAPI.models.response.AppUserResponse;
+import com.agicomputers.LoanAPI.models.response.VisibleAppUserData;
 import com.agicomputers.LoanAPI.security.AppUserAuthentication;
 import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
 import com.agicomputers.LoanAPI.services.user_services.AppUserValidatorService;
@@ -10,10 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import com.agicomputers.LoanAPI.models.dto.AppUserDTO;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/app_user")
+@RequestMapping("/app_users")
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AppUserController {
@@ -43,9 +42,9 @@ public class AppUserController {
                 AppUserDTO udto = appUserService.getUser(uid);
                 //Handle error if any
                 if (udto == null)
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found; Valid UID but User account may have been deleted ");
+                    return ResponseEntity.notFound().build();
                 // Instance of VisibleAppUserData, not all details should be exposed to the client
-                AppUserResponse.VisibleAppUserData vaud = AppUserResponse.getVisibleAppUserDataInstance();
+                VisibleAppUserData vaud = new VisibleAppUserData();
                 BeanUtils.copyProperties(udto, vaud);
                 //Return entity containing the users
                 return ResponseEntity.ok(
@@ -56,8 +55,22 @@ public class AppUserController {
                                 .timestamp(LocalDateTime.now())
                                 .build()
                 );
-            } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "FORBIDDEN");
-        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    AppUserResponse.builder()
+                            .status(HttpStatus.FORBIDDEN)
+                            .statusCode(HttpStatus.FORBIDDEN.value())
+                            .message("You dont own this account")
+                            .timestamp(LocalDateTime.now())
+                            .build()
+            );
+        } else return ResponseEntity.badRequest().body(
+                AppUserResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message("Invalid Uid")
+                        .timestamp(LocalDateTime.now())
+                        .build()
+                );
     }
 
     @DeleteMapping("/{uid}")
@@ -79,9 +92,23 @@ public class AppUserController {
                                     .build()
                     );
                 } else
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found; Valid UID but User account may have been deleted ");
-            } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "FORBIDDEN");
-        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
+                    return ResponseEntity.notFound().build();
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    AppUserResponse.builder()
+                            .status(HttpStatus.FORBIDDEN)
+                            .statusCode(HttpStatus.FORBIDDEN.value())
+                            .message("You dont own this account")
+                            .timestamp(LocalDateTime.now())
+                            .build()
+            );
+        } else return ResponseEntity.badRequest().body(
+                AppUserResponse.builder()
+                        .statusCode(400)
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message("Invalid Uid")
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
 
 
     }
@@ -102,8 +129,22 @@ public class AppUserController {
                 LinkedHashMap<String, String> errors = appUserValidatorService.validate();
 
                 return userOrError(errors, udto, uid);
-            } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "FORBIDDEN");
-        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid UID");
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    AppUserResponse.builder()
+                            .status(HttpStatus.FORBIDDEN)
+                            .statusCode(HttpStatus.FORBIDDEN.value())
+                            .message("You dont own this account")
+                            .timestamp(LocalDateTime.now())
+                            .build()
+            );
+        } else return ResponseEntity.badRequest().body(
+                AppUserResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .statusCode(400)
+                        .message("Invalid Uid")
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
 
     private ResponseEntity<AppUserResponse> userOrError(LinkedHashMap<String, String> errors, AppUserDTO udto, String uid) {
@@ -118,7 +159,7 @@ public class AppUserController {
             //If appUser with appUserId exists in database
             if (udto != null) {
                 // Instance of VisibleAppUserData, not all details should be exposed to the client
-                AppUserResponse.VisibleAppUserData vaud = AppUserResponse.getVisibleAppUserDataInstance();
+                VisibleAppUserData vaud = new VisibleAppUserData();
                 BeanUtils.copyProperties(udto, vaud);
                 return ResponseEntity.ok(
                         //Return ResponseEntity containing the user
@@ -130,10 +171,10 @@ public class AppUserController {
                                 .build()
                 );
             } else
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found; Valid UID but User account may have been deleted ");
+                return ResponseEntity.notFound().build();
         } else {
             appUserValidatorService.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
-            return ResponseEntity.ok(
+            return ResponseEntity.badRequest().body(
                     //Return ResponseEntity containing the errors
                     AppUserResponse.builder()
                             .status(HttpStatus.BAD_REQUEST)

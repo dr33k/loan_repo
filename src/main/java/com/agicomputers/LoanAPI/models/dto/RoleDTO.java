@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 public class RoleDTO implements DTO{
     private Integer roleId;
     private String roleName;
-    private AppUserRole roleType = AppUserRole.APPUSER;
-    private String[] roleAuthorities = {"app_user:read"};
+    private String[] roleAuthoritiesArray;
     private String roleDescription;
 }

@@ -14,11 +14,12 @@ public enum AppUserRole {
             AppUserAuthorities.BLOG)),
 
     SUBADMIN(Set.of( AppUserAuthorities.APPUSER_READ,
-                AppUserAuthorities.APPUSER_WRITE)),
+                AppUserAuthorities.APPUSER_WRITE,
+            AppUserAuthorities.ADMIN_READ)),
 
     BLOGGER( Set.of(AppUserAuthorities.BLOG)),
 
-    APPUSER(Set.of(AppUserAuthorities.APPUSER_READ));
+    APPUSER(Set.of(AppUserAuthorities.APPUSER_READ,AppUserAuthorities.APPUSER_WRITE));
 
     private final Set<AppUserAuthorities> permissions;
 

@@ -87,20 +87,20 @@ public class AppUserValidatorService{
         LocalDate now = LocalDate.now();
         Period userAge =  userDob.until(now);
 
-            if (userDob.getYear() < 1900 || userDob.getYear() > now.getYear()) errors.put("DOB_YEAR: ", DOB_FMT_YMD);
-            else if (userDob.getMonthValue() < 1 || userDob.getMonthValue() > 12) errors.put("DOB_MONTH: ", DOB_FMT_YMD);
-            else if (userDob.getDayOfMonth()< 1 || userDob.getDayOfMonth() > userDob.lengthOfMonth()) errors.put("DOB_DAY: ", DOB_FMT_YMD);
-            else if (userAge.getYears()< 18) errors.put("DOB: ", DOB_18);
+            if (userDob.getYear() < 1900 || userDob.getYear() > now.getYear()) errors.put("dob_year", DOB_FMT_YMD);
+            else if (userDob.getMonthValue() < 1 || userDob.getMonthValue() > 12) errors.put("dob_month", DOB_FMT_YMD);
+            else if (userDob.getDayOfMonth()< 1 || userDob.getDayOfMonth() > userDob.lengthOfMonth()) errors.put("dob_day", DOB_FMT_YMD);
+            else if (userAge.getYears()< 18) errors.put("dob", DOB_18);
         }
-        catch(NullPointerException nullEx){errors.put("DOB: ", DOB_FMT);}
-        catch(Exception e){errors.put("DOB: ",DOB_FMT_YMD);}
+        catch(NullPointerException nullEx){errors.put("dob", DOB_FMT);}
+        catch(Exception e){errors.put("dob",DOB_FMT_YMD);}
     }
     public void validateEmail(String email){
         try {
-            if (!email.matches(".+@.+\\..{2,}")) errors.put("Email: ", EMAIL_FMT);
-            else if (emailExists(email)) errors.put("Email: ", EMAIL_EX);
+            if (!email.matches(".+@.+\\..{2,}")) errors.put("email", EMAIL_FMT);
+            else if (emailExists(email)) errors.put("email", EMAIL_EX);
         }
-        catch(NullPointerException nullEx){errors.put("Email: ", EMAIL_FMT);}
+        catch(NullPointerException nullEx){errors.put("email", EMAIL_FMT);}
     }
 
     //This method validates using the international phone number format
@@ -114,29 +114,29 @@ public class AppUserValidatorService{
     
     public void validateNIN(String nin){
         try {
-            if (!nin.matches("^[0-9]{11}$")) errors.put("NIN: ", NIN);
-            else if (ninExists(nin)) errors.put("NIN: ", NIN_EX);
+            if (!nin.matches("^[0-9]{11}$")) errors.put("nin", NIN);
+            else if (ninExists(nin)) errors.put("nin", NIN_EX);
         }
-        catch(NullPointerException nullEx) { errors.put("NIN: ", NIN);};
+        catch(NullPointerException nullEx) { errors.put("nin", NIN);};
     }
 
     public void validateBVN(String bvn){
         try {
-            if (!bvn.matches("^[0-9]{10}$")) errors.put("BVN: ", BVN);
-            else if (bvnExists(bvn)) errors.put("BVN: ", BVN_EX);
+            if (!bvn.matches("^[0-9]{10}$")) errors.put("bvn", BVN);
+            else if (bvnExists(bvn)) errors.put("bvn", BVN_EX);
         }
-        catch(NullPointerException nullEx) { errors.put("BVN: ", BVN);};
+        catch(NullPointerException nullEx) { errors.put("bvn", BVN);};
     }
 
     public void validatePassword(String password){
         try {
-            if (password.length() < 8) errors.put("Password: ", PPHRASE_LEN);
+            if (password.length() < 8) errors.put("password", PPHRASE_LEN);
             else if (!password.matches(".*[A-Z]+.*")  //There is no uppercase Letter
                     || !password.matches(".*[a-z]+.*")// There is no lowercase letter
                     || !password.matches(".*[0-9]+.*")// There is no number
                     || !password.matches(".*[!#&@$%\\^*()+=|{}\\\"\\\\;:/?,.'<>`~\\-\\[\\]]+.*"))//There is no special character
-                errors.put("Password: ", PPHRASE_OTHERS);
-        } catch(NullPointerException nullEx) { errors.put("Password: ", PPHRASE_LEN);}
+                errors.put("password", PPHRASE_OTHERS);
+        } catch(NullPointerException nullEx) { errors.put("password", PPHRASE_LEN);}
     }
 
     //This method validates addresses or other textbox inputs
@@ -160,19 +160,19 @@ public class AppUserValidatorService{
                 if (!photo.matches(".+\\.jpg$")
                         && !photo.matches(".+\\.jpeg$")
                         && !photo.matches(".+\\.png$")) {
-                    errors.put("Photo: ", PHOTO_FMT);
+                    errors.put("photo", PHOTO_FMT);
                 } else {
                     //Check photo size. Maximum limit is 500000 bytes ie 500KB
                     if (photoFile.length() > 500000) {
-                        errors.put("Photo: ", PHOTO_SIZE);
+                        errors.put("photo", PHOTO_SIZE);
                         return;
                     } else {
                         photoFile.renameTo(new File("C:\\Users\\Emmanuel Obiakor\\Pictures\\LoanApiImages\\passportImages\\" + photoFile.getName()));
                     }
                 }
             }
-            else{errors.put("Photo: ", PHOTO_EX);}
-        }catch(NullPointerException nullEx){errors.put("Photo: ", PHOTO_EX);}
+            else{errors.put("photo", PHOTO_EX);}
+        }catch(NullPointerException nullEx){errors.put("photo", PHOTO_EX);}
     }
 
     //This method purifies names and addresses from the request
@@ -221,33 +221,33 @@ public class AppUserValidatorService{
     
     public LinkedHashMap<String, String> validate(){
         if(isPost) {
-            validateName("First name: ", dto.getAppUserFname());
-            validateName("Last name: ", dto.getAppUserLname());
-            validatePhone("Phone No. 1: ", dto.getAppUserPhone1());
-            validatePhone("Phone No. 2: ", dto.getAppUserPhone2());
+            validateName("first_name", dto.getAppUserFname());
+            validateName("last_name", dto.getAppUserLname());
+            validatePhone("phone_no_1", dto.getAppUserPhone1());
+            validatePhone("phone_no_2", dto.getAppUserPhone2());
             validateEmail(dto.getAppUserEmail());
             validateDob(dto.getAppUserDob());
             validatePassword(dto.getAppUserPassword());
             validatePhoto(dto.getAppUserPassportPhoto());
             validateNIN(dto.getAppUserNIN());
             validateBVN(dto.getAppUserBVN());
-            validateText("Address: ", dto.getAppUserAddress());
-            validateText("Occupation Location: ", dto.getAppUserOccupationLocation());
+            validateText("address", dto.getAppUserAddress());
+            validateText("occupation_location", dto.getAppUserOccupationLocation());
 
         }
         else{
-            if(dto.getAppUserFname()!=null)validateName("First name: ", dto.getAppUserFname());
-            if(dto.getAppUserLname()!=null)validateName("Last name: ", dto.getAppUserLname());
-            if(dto.getAppUserPhone1()!=null)validatePhone("Phone No. 1: ", dto.getAppUserPhone1());
-            if(dto.getAppUserPhone2()!=null)validatePhone("Phone No. 2: ", dto.getAppUserPhone2());
+            if(dto.getAppUserFname()!=null)validateName("first_name", dto.getAppUserFname());
+            if(dto.getAppUserLname()!=null)validateName("last_name", dto.getAppUserLname());
+            if(dto.getAppUserPhone1()!=null)validatePhone("phone_no_1", dto.getAppUserPhone1());
+            if(dto.getAppUserPhone2()!=null)validatePhone("phone_no_1", dto.getAppUserPhone2());
             if(dto.getAppUserEmail()!=null)validateEmail(dto.getAppUserEmail());
             if(dto.getAppUserDob()!=null)validateDob(dto.getAppUserDob());
             if(dto.getAppUserPassword()!=null)validatePassword(dto.getAppUserPassword());
             if(dto.getAppUserPassportPhoto()!=null)validatePhoto(dto.getAppUserPassportPhoto());
             if(dto.getAppUserNIN()!=null)validateNIN(dto.getAppUserNIN());
             if(dto.getAppUserBVN()!=null)validateBVN(dto.getAppUserBVN());
-            if(dto.getAppUserAddress()!=null)validateText("Address: ", dto.getAppUserAddress());
-            if(dto.getAppUserOccupationLocation()!=null)validateText("Occupation Location: ", dto.getAppUserOccupationLocation());
+            if(dto.getAppUserAddress()!=null)validateText("address:", dto.getAppUserAddress());
+            if(dto.getAppUserOccupationLocation()!=null)validateText("occupation_location", dto.getAppUserOccupationLocation());
         }
         return errors;
     }

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
@@ -26,7 +25,7 @@ public class RoleService {
     public HashSet<RoleDTO> getAllRoles() {
         log.info("______________________Getting all roles_______________________");
         Set<RoleDTO> roles = new HashSet<RoleDTO>(0);
-        Iterable<Role> rolesFromRepo = roleRepository.findAll(PageRequest.of(0, 1));
+        Iterable<Role> rolesFromRepo = roleRepository.findAll(PageRequest.of(0, 10));
 
         RoleDTO rdto;
         Iterator<Role> iterator = rolesFromRepo.iterator();
@@ -46,9 +45,8 @@ public class RoleService {
 
         return rdto;
     }
-    public Role getRoleObject(String roleName) {
+    public Role getRoleEntity(String roleName) {
         Optional<Role> roleOptional = roleRepository.findByRoleName(roleName);
-
         return roleOptional.orElse(null);
     }
 

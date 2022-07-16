@@ -11,4 +11,5 @@ import java.util.Set;
 @Repository
 public interface LoanRepository extends JpaRepository<Loan,Long> {
     Optional<Loan> findByLoanCode(String loanName);
+    Iterable<Loan> findAllByAppUserUid(String loanName);
 }

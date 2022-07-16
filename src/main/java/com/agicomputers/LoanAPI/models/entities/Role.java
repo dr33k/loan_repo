@@ -1,15 +1,9 @@
 package com.agicomputers.LoanAPI.models.entities;
 
-import com.agicomputers.LoanAPI.models.enums.AppUserAuthorities;
-import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-
 import javax.persistence.*;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name="role")
@@ -26,36 +20,44 @@ public class Role {
     private String roleName;
 
     @Column(nullable = false)
-    private String[] roleAuthorities;
+    private String roleAuthorities;
+
+    @Transient
+    private String[] roleAuthoritiesArray;
+
 
     @Column(nullable = false)
     private String roleDescription;
 
-    public Role(Integer id, String roleName, Set<? extends GrantedAuthority> authorities) {
-        this.roleId = id;
-        this.roleName = roleName;
+   public String[] getRoleAuthoritiesArray() {
+       //Arrays in the Database are in the format
+       //"{"foo","bar"}"
 
-//map Set<? extends GrantedAuthorities> into List<String>, add the ROLE and then assign to roleAuthorities
-        List<String> temp =
-                authorities
-                .stream()
-                .map((authority)->{return authority.toString();})
-                .collect(Collectors.toList());
-        if(!temp.contains("ROLE_" + roleName.toUpperCase()))temp.add("ROLE_" + roleName.toUpperCase());
+       String withoutBraces = this.roleAuthorities.substring(1,this.roleAuthorities.length()-1);
+       this.roleAuthoritiesArray = withoutBraces.split(",");
+       return this.roleAuthoritiesArray;
+   }
 
-        this.roleAuthorities = temp.toArray(this.roleAuthorities);
+   public void setRoleAuthoritiesArray(String[] roleAuthoritiesArray){
+       this.roleAuthoritiesArray = roleAuthoritiesArray;
+       //Set roleAuthorities in the format
+       //"{"foo","bar"}"
 
-    }
+       String auths = "";
+       for(int i= 0; i<roleAuthoritiesArray.length;i++){
+           auths.concat(
+                   roleAuthoritiesArray[i]
+                           .concat(
+                                   ((i != roleAuthoritiesArray.length-1)?",":"")
+                           )
+           );
+       }
 
-    public void setRoleAuthorities(String... roleAuthorities) {
-        String[] stringRoleAuthorities= {};
-        //Add the "ROLE" authority
-        Set<String> stringRoleAuthoritiesSet = Set.of(roleAuthorities);
-        if(!stringRoleAuthoritiesSet.contains("ROLE_" + roleName.toUpperCase()))
-            stringRoleAuthoritiesSet.add("ROLE_" + roleName.toUpperCase());
-        stringRoleAuthorities = stringRoleAuthoritiesSet.toArray(stringRoleAuthorities);
+       auths = "{"
+               .concat(auths)
+               .concat("}");
 
-        this.roleAuthorities = stringRoleAuthorities;
-    }
+       this.roleAuthorities = auths;
+   }
 
 }

@@ -3,6 +3,7 @@ package com.agicomputers.LoanAPI.controllers.user_controllers;
 import com.agicomputers.LoanAPI.models.dto.AppUserDTO;
 import com.agicomputers.LoanAPI.models.request.AppUserRequest;
 import com.agicomputers.LoanAPI.models.response.AppUserResponse;
+import com.agicomputers.LoanAPI.models.response.VisibleAppUserData;
 import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
 import com.agicomputers.LoanAPI.services.user_services.AppUserValidatorService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -27,7 +29,7 @@ public class RegistrationController {
     @Autowired
     private AppUserValidatorService appUserValidatorService;
 
-    @PostMapping("/register")
+    @PostMapping()
     public ResponseEntity<AppUserResponse> createUser(@RequestBody AppUserRequest request) {
         //Create a DTO
         AppUserDTO udto = new AppUserDTO();
@@ -44,10 +46,10 @@ public class RegistrationController {
 
 
             // Instance of VisibleAppUserData, not all details should be exposed to the client
-            AppUserResponse.VisibleAppUserData vaud = AppUserResponse.getVisibleAppUserDataInstance();
+            VisibleAppUserData vaud = new VisibleAppUserData();
             BeanUtils.copyProperties(udto, vaud);
             //Return ResponseEntity containing the users
-            return ResponseEntity.ok(
+            return ResponseEntity.created(URI.create("/dashboard")).body(
                     AppUserResponse.builder()
                             .status(HttpStatus.CREATED)
                             .statusCode(HttpStatus.CREATED.value())
@@ -58,7 +60,7 @@ public class RegistrationController {
         } else {
             appUserValidatorService.setErrors(new LinkedHashMap<>(0));//Clear errors from previous request
 
-            return ResponseEntity.ok(
+            return ResponseEntity.badRequest().body(
                     //Return ResponseEntity containing the errors
                     AppUserResponse.builder()
                             .status(HttpStatus.BAD_REQUEST)

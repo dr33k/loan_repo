@@ -27,32 +27,5 @@ public class AppUserResponse {
     private HttpStatus status;
     private LocalDateTime timestamp;
 
-    public static VisibleAppUserData getVisibleAppUserDataInstance() {
-        return new VisibleAppUserData();
-    }
-
-
-    @Data
-    @NoArgsConstructor
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-   public static class VisibleAppUserData {
-        private String appUserUid;//Username
-        private String appUserFname;
-        private String appUserLname;
-        private LocalDate appUserDob;
-        private String appUserEmail;
-        private String appUserPhone1;
-        private String appUserPhone2;
-        private String appUserAddress;
-        private Float appUserBalance;
-        private String appUserNIN;
-        private String appUserBVN;
-        private String appUserPassportPhoto;
-        private String appUserNINPhoto;
-        private Role appUserRole;
-        private UserOccupation appUserOccupation;
-        private String appUserOccupationLocation;
-        private Boolean appUserRewarded;
-    }
 }
 

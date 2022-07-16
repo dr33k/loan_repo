@@ -1,8 +1,9 @@
 package com.agicomputers.LoanAPI.services.user_services;
 
 import com.agicomputers.LoanAPI.models.entities.AppUser;
+import com.agicomputers.LoanAPI.models.enums.AppUserRole;
 import com.agicomputers.LoanAPI.repositories.user_repositories.AppUserRepository;
-import com.agicomputers.LoanAPI.repositories.user_repositories.AuthenticatedUserRepository;
+import com.agicomputers.LoanAPI.services.role_service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +20,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.zip.CRC32;
 
 import javax.transaction.Transactional;
@@ -31,28 +35,29 @@ import java.util.*;
 public class AppUserServiceImpl implements UserService, UserDetailsService {
 
     @Qualifier("appUserRepository1")
-    @Autowired
     private final AppUserRepository appUserRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private final AuthenticatedUserRepository authenticatedUserRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Override
     public HashSet<AppUserDTO> getAllUsers() {
         log.info("______________________Getting all app users_______________________");
-        Set<AppUserDTO> appUsers = new HashSet<AppUserDTO>(0);
+        Set<AppUserDTO> appUserDTOS = new HashSet<AppUserDTO>(0);
         Iterable<AppUser> appUsersFromRepo = appUserRepository.findAll(PageRequest.of(0, 20));
 
         AppUserDTO udto;
         Iterator<AppUser> iterator = appUsersFromRepo.iterator();
         while (iterator.hasNext()) {
             udto = new AppUserDTO();
-            BeanUtils.copyProperties(iterator.next(), udto);
-            appUsers.add(udto);
+            AppUser appUser = iterator.next();
+            BeanUtils.copyProperties(appUser, udto);
+            //Converts from java.sql.Date to java.time.LocalDate
+            udto.setAppUserDob(appUser.getAppUserDob().toLocalDate());
+            //Converts from java.sql.Timestamp to java.time.LocalDateTime
+            udto.setAppUserDor(appUser.getAppUserDor().toLocalDateTime());
+            appUserDTOS.add(udto);
         }
-        return (HashSet<AppUserDTO>) appUsers;
+        return (HashSet<AppUserDTO>) appUserDTOS;
     }
 
     @Override
@@ -65,6 +70,10 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
                 AppUser appUser = optionalAppUser.get();
                 AppUserDTO udto = new AppUserDTO();
                 BeanUtils.copyProperties(appUser, udto);
+                //Converts from java.sql.Date to java.time.LocalDate
+                udto.setAppUserDob(appUser.getAppUserDob().toLocalDate());
+                //Converts from java.sql.Timestamp to java.time.LocalDateTime
+                udto.setAppUserDor(appUser.getAppUserDor().toLocalDateTime());
                 return udto;
             }
 
@@ -81,6 +90,10 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
             AppUser appUser = appUserWithEmail.get();
             AppUserDTO udto = new AppUserDTO();
             BeanUtils.copyProperties(appUser, udto);
+            //Converts from java.sql.Date to java.time.LocalDate
+            udto.setAppUserDob(appUser.getAppUserDob().toLocalDate());
+            //Converts from java.sql.Timestamp to java.time.LocalDateTime
+            udto.setAppUserDor(appUser.getAppUserDor().toLocalDateTime());
             return udto;
         } else return null;
     }
@@ -112,8 +125,18 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
 
         //Get AppUser's custom generated Uid
         String generatedAppUserUid = generateAppUserUid(udto.getAppUserEmail());
+
         //Set AppUser's custom generated Uid
         appUser.setAppUserUid(generatedAppUserUid);
+
+        //Set AppUser's Date of Birth
+        appUser.setAppUserDob(Date.valueOf(udto.getAppUserDob()));
+
+        //Set AppUser's default role
+        appUser.setRole(roleService.getRoleEntity(AppUserRole.APPUSER.name()));
+
+        //Set AppUser's sDate of Registration
+        appUser.setAppUserDor(Timestamp.valueOf(LocalDateTime.now()));
 
         //Save record
         appUserRepository.save(appUser);
@@ -140,6 +163,7 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
                 if (udto.getAppUserPhone2() != null) appUser.setAppUserPhone2(udto.getAppUserPhone2());
                 if (udto.getAppUserEmail() != null) appUser.setAppUserEmail(udto.getAppUserEmail());
                 if (udto.getAppUserPassword() != null) appUser.setAppUserPassword(udto.getAppUserPassword());
+                if (udto.getAppUserDob() != null) appUser.setAppUserDob(Date.valueOf(udto.getAppUserDob()));
                 if (udto.getAppUserPassportPhoto() != null)
                     appUser.setAppUserPassportPhoto(udto.getAppUserPassportPhoto());
                 if (udto.getAppUserNIN() != null) appUser.setAppUserNIN(udto.getAppUserNIN());
@@ -242,8 +266,9 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return authenticatedUserRepository.getAuthenticatedUser(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("Username %s not found", username)));
+        return appUserRepository.findByAppUserUid(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("UID %s not found", username)));
 
     }
+
 }

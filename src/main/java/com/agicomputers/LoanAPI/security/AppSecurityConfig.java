@@ -42,8 +42,9 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/","/register").permitAll()
-                .antMatchers("/app_user/**").hasAnyAuthority("appuser:read","appuser:write")
+                .antMatchers("/app_users/**").hasAnyAuthority("appuser:read","appuser:write")
                 .antMatchers("/administrator/**").hasAnyRole("ADMIN","SUBADMIN")
+                .antMatchers(HttpMethod.GET,"/error").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

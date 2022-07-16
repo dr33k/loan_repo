@@ -4,6 +4,7 @@ import com.agicomputers.LoanAPI.models.dto.LoanDTO;
 import com.agicomputers.LoanAPI.models.entities.Loan;
 import com.agicomputers.LoanAPI.models.enums.LoanStatus;
 import com.agicomputers.LoanAPI.repositories.user_repositories.LoanRepository;
+import com.agicomputers.LoanAPI.services.user_services.AppUserValidatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageRequest;
@@ -22,10 +23,25 @@ import java.util.Set;
 public class LoanService {
 
     private final LoanRepository loanRepository;
+    private final AppUserValidatorService appUserValidatorService;
 
     public HashSet<LoanDTO> getAllLoans() {
         Set<LoanDTO> loans = new HashSet<LoanDTO>(0);
         Iterable<Loan> loansFromRepo = loanRepository.findAll(PageRequest.of(0, 20));
+
+        LoanDTO ldto;
+        Iterator<Loan> iterator = loansFromRepo.iterator();
+        while (iterator.hasNext()) {
+            ldto = new LoanDTO();
+            BeanUtils.copyProperties(iterator.next(), ldto);
+            loans.add(ldto);
+        }
+        return (HashSet<LoanDTO>) loans;
+    }
+
+    public HashSet<LoanDTO> getAllLoansBy(String uid) {
+        Set<LoanDTO> loans = new HashSet<LoanDTO>(0);
+        Iterable<Loan> loansFromRepo = loanRepository.findAllByAppUserUid(uid);
 
         LoanDTO ldto;
         Iterator<Loan> iterator = loansFromRepo.iterator();
@@ -59,9 +75,10 @@ public class LoanService {
         Loan loan = new Loan(); //Loan Entity
         BeanUtils.copyProperties(ldto, loan);
 
-        //Get Loan's custom generated code
-        String generatedLoanCode = loan.getAppUser().getAppUserUid()
-                .concat(leadingZeros(loanRepository.count()+""));
+        //Generate Loan code
+        //Sample: 000_1234567890ABCDEF
+        String generatedLoanCode =
+                leadingZeros(loanRepository.count()+"").concat("_").concat(loan.getAppUser().getAppUserUid());
 
         //Set Loan's generated code
         loan.setLoanCode(generatedLoanCode);
@@ -84,7 +101,7 @@ public class LoanService {
     }
 
     private String leadingZeros(String s){
-        while(s.length()<5){s="0"+s;}
+        while(s.length()<3){s="0"+s;}
         return s;
     }
 
@@ -118,5 +135,18 @@ public class LoanService {
 
     private float calculateLoanAmount(float rate, float principal, int months){
         return (principal * rate * months)/100;
+    }
+
+    public boolean validateLoanCode(String loanCode){
+        try {
+            String loanNum = loanCode.substring(0, 3);
+            String uid = loanCode.substring(4);
+
+            Integer.parseInt(loanNum);
+
+            return((loanCode.charAt(3) == '_') && (appUserValidatorService.validateUid(uid)));
+
+        }
+        catch (Exception e){return false;}
     }
 }
