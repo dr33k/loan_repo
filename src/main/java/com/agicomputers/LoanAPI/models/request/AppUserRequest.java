@@ -26,7 +26,6 @@ public class AppUserRequest{
     private String appUserPassword;
     private String appUserNIN;
     private String appUserBVN;
-    private String appUserPassportPhoto;
     private UserOccupation appUserOccupation;
     private String appUserOccupationLocation;
 

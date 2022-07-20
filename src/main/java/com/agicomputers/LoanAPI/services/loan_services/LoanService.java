@@ -41,7 +41,7 @@ public class LoanService {
 
     public HashSet<LoanDTO> getAllLoansBy(String uid) {
         Set<LoanDTO> loans = new HashSet<LoanDTO>(0);
-        Iterable<Loan> loansFromRepo = loanRepository.findAllByAppUserUid(uid);
+        Iterable<Loan> loansFromRepo = loanRepository.findAllByAppUserAppUserUid(uid);
 
         LoanDTO ldto;
         Iterator<Loan> iterator = loansFromRepo.iterator();

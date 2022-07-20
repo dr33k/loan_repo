@@ -18,19 +18,19 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Validated
 public class LoanRequest {
-    private final Long MAX_PRINCIPAL = 1500000L;
-    private final Integer MAX_MONTH = 18;
-    private final String NULL="Value cannot be null";
-    private final String LENGTH="Input too little";
-    private final String CONSTRAINT_LOW="Invalid Value";
-    private final String CONSTRAINT_HIGH="Maximum Value exceeded";
+/*    private static final Long MAX_PRINCIPAL = 1500000L;
+    private static final Integer MAX_MONTH = 18;
+    private static final String NULL="Value cannot be null";
+    private static final String LENGTH="Input too little";
+    private static final String CONSTRAINT_LOW="Invalid Value";
+    private static final String CONSTRAINT_HIGH="Maximum Value exceeded";
+*/
 
-
-    @Max(value = MAX_PRINCIPAL,message = "Unfortunately, that's more than we can handle, try a lower amount please")
+    @Max(value = 1500000L,message = "Unfortunately, that's more than we can handle, try a lower amount please")
     @Min(value = 0L,message = "That's too little")
     private Float loanPrincipal;
 
-    @Max(value=MAX_MONTH,message="Maximum amount of time exceeded")
+    @Max(value=18,message="Maximum amount of time exceeded")
     @Min(value=0,message = "Maximum amount of time exceeded")
     private Integer loanPeriodMonths;
 

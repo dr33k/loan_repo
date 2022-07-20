@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoleDTO implements DTO{
-    private Integer roleId;
     private String roleName;
     private String[] roleAuthoritiesArray;
     private String roleDescription;

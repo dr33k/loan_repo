@@ -21,7 +21,7 @@ public class Loan {
     private int loanId;
 
     @ManyToOne
-    @JoinColumn(name="app_user_id", columnDefinition = "JOIN app_user.app_user_uid, app_user.app_user_fname, app_user.app_user_lname, app_user.app_user_email, app_user.app_user_phone1, app_user.app_user_phone2 ON app_user.app_user_id = loan.app_user_id")
+    @JoinColumn(name="app_user_id", referencedColumnName = "appUserUid")
     private AppUser appUser;
     @Column(length = 20, unique = true,nullable = false)
     private String loanCode;

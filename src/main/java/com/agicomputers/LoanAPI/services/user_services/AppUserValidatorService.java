@@ -201,7 +201,7 @@ public class AppUserValidatorService{
             dto.setAppUserBVN(strip(dto.getAppUserBVN()));
             dto.setAppUserAddress(AppUserValidatorService.strip(dto.getAppUserAddress()));
             dto.setAppUserOccupationLocation(AppUserValidatorService.strip(dto.getAppUserOccupationLocation()));
-            dto.setAppUserPassportPhoto(AppUserValidatorService.stripFile(dto.getAppUserPassportPhoto()));
+           // dto.setAppUserPassportPhoto(AppUserValidatorService.stripFile(dto.getAppUserPassportPhoto()));
         }
         else{
             if(dto.getAppUserFname()!=null)dto.setAppUserFname(AppUserValidatorService.strip(dto.getAppUserFname()));
@@ -212,7 +212,7 @@ public class AppUserValidatorService{
             if(dto.getAppUserNIN()!=null)dto.setAppUserNIN(strip(dto.getAppUserNIN()));
             if(dto.getAppUserAddress()!=null)dto.setAppUserAddress(AppUserValidatorService.strip(dto.getAppUserAddress()));
             if(dto.getAppUserOccupationLocation()!=null)dto.setAppUserOccupationLocation(AppUserValidatorService.strip(dto.getAppUserOccupationLocation()));
-            if(dto.getAppUserPassportPhoto()!=null)dto.setAppUserPassportPhoto(AppUserValidatorService.stripFile(dto.getAppUserPassportPhoto()));
+           // if(dto.getAppUserPassportPhoto()!=null)dto.setAppUserPassportPhoto(AppUserValidatorService.stripFile(dto.getAppUserPassportPhoto()));
         }
         return (AppUserDTO) dto;
     }
@@ -228,7 +228,7 @@ public class AppUserValidatorService{
             validateEmail(dto.getAppUserEmail());
             validateDob(dto.getAppUserDob());
             validatePassword(dto.getAppUserPassword());
-            validatePhoto(dto.getAppUserPassportPhoto());
+           // validatePhoto(dto.getAppUserPassportPhoto());
             validateNIN(dto.getAppUserNIN());
             validateBVN(dto.getAppUserBVN());
             validateText("address", dto.getAppUserAddress());
@@ -243,7 +243,7 @@ public class AppUserValidatorService{
             if(dto.getAppUserEmail()!=null)validateEmail(dto.getAppUserEmail());
             if(dto.getAppUserDob()!=null)validateDob(dto.getAppUserDob());
             if(dto.getAppUserPassword()!=null)validatePassword(dto.getAppUserPassword());
-            if(dto.getAppUserPassportPhoto()!=null)validatePhoto(dto.getAppUserPassportPhoto());
+           // if(dto.getAppUserPassportPhoto()!=null)validatePhoto(dto.getAppUserPassportPhoto());
             if(dto.getAppUserNIN()!=null)validateNIN(dto.getAppUserNIN());
             if(dto.getAppUserBVN()!=null)validateBVN(dto.getAppUserBVN());
             if(dto.getAppUserAddress()!=null)validateText("address:", dto.getAppUserAddress());

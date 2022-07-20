@@ -20,7 +20,6 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response {
     private Set<? extends DTO> dataSet;
-    LinkedHashMap errors;
     String message;
     int statusCode;
     HttpStatus status;

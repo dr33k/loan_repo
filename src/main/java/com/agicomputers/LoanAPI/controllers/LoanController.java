@@ -83,7 +83,7 @@ public class LoanController {
         );
     }
 
-    @GetMapping("/{uid}")
+    @GetMapping("/by/{uid}")
     public ResponseEntity<Response> getAllLoansBy(@PathVariable String uid) {
         //Validate the Uid provided
         if (appUserValidatorService.validateUid(uid)) {
