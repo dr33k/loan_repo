@@ -46,10 +46,10 @@ public class AppUser implements UserDetails {
     @Column(nullable = false)
     private Date appUserDob;
 
-    @Column(nullable = false)
-    private Timestamp appUserDor;
+  @Column(nullable = false)
+  private Timestamp appUserDor;
 
-    @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = true)
     private String appUserEmail;
 
     @Column( length = 20, nullable = false)
@@ -108,6 +108,12 @@ public class AppUser implements UserDetails {
         this.appUserPassword = appUserPassword;
     }
 
+  public AppUser(String appUserUid, String appUserEmail, String appUserPassword,Role role) {
+    this.role = role;
+    this.appUserEmail = appUserEmail;
+    this.appUserPassword = appUserPassword;
+    this.appUserUid = appUserUid;
+  }
     //User Service Getters & Setters
     @Override
     public String getUsername() {

@@ -26,17 +26,15 @@ public class Loan {
     @Column(length = 20, unique = true,nullable = false)
     private String loanCode;
     @Column(nullable = false, precision = 2)
-    private Float loanPrincipal;
+    private Float loanAmount;
     @Column(nullable = false, precision = 2)
     private Float loanInterestRatePerMonth;
     @Column(nullable = false)
     private Integer loanPeriodMonths;
     @Column(nullable = false, precision = 2)
-    private Float loanAmount;
-    @Column(nullable = false, precision = 2)
     private Float loanAmountPaid = 0.0F;
     @Column(nullable = false, precision = 2)
-    private Float loanAmountRemaining = loanAmount;
+    private Float loanAmountRemaining;
     @Column(nullable = false)
     private LoanStatus loanStatus = LoanStatus.PROCESSING;
     @Column(nullable = false)

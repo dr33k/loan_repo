@@ -74,6 +74,16 @@ public class AdminController {
     public ResponseEntity<AppUserResponse> getAllUsers() {
         //Create a data structure to hold all appUsers returned from database
         Set<AppUserDTO> appUserDtoSet = appUserService.getAllUsers();
+        if(appUserDtoSet == null){
+            return ResponseEntity.ok(
+                    AppUserResponse.builder()
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .message("The Database of App Users is currently empty")
+                            .timestamp(LocalDateTime.now())
+                            .build()
+            );
+        }
         // Instance of VisibleAppUserData, not all details should be exposed to the client
         VisibleAppUserData vaud;
         //Using a loop, convert the Set ofAppUserDTO types into a Set of VisibleAppUserData

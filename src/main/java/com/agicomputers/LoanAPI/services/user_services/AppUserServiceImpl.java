@@ -43,19 +43,23 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
     public HashSet<AppUserDTO> getAllUsers() {
         log.info("______________________Getting all app users_______________________");
         Set<AppUserDTO> appUserDTOS = new HashSet<AppUserDTO>(0);
-        Iterable<AppUser> appUsersFromRepo = appUserRepository.findAll(PageRequest.of(0, 20));
+        try {
+            Iterable<AppUser> appUsersFromRepo = appUserRepository.findAll(PageRequest.of(0, 20));
 
-        AppUserDTO udto;
-        Iterator<AppUser> iterator = appUsersFromRepo.iterator();
-        while (iterator.hasNext()) {
-            udto = new AppUserDTO();
-            AppUser appUser = iterator.next();
-            BeanUtils.copyProperties(appUser, udto);
-            //Converts from java.sql.Date to java.time.LocalDate
-            udto.setAppUserDob(appUser.getAppUserDob().toLocalDate());
-            //Converts from java.sql.Timestamp to java.time.LocalDateTime
-            udto.setAppUserDor(appUser.getAppUserDor().toLocalDateTime());
-            appUserDTOS.add(udto);
+            AppUserDTO udto;
+            Iterator<AppUser> iterator = appUsersFromRepo.iterator();
+            while (iterator.hasNext()) {
+                udto = new AppUserDTO();
+                AppUser appUser = iterator.next();
+                BeanUtils.copyProperties(appUser, udto);
+                //Converts from java.sql.Date to java.time.LocalDate
+                udto.setAppUserDob(appUser.getAppUserDob().toLocalDate());
+                //Converts from java.sql.Timestamp to java.time.LocalDateTime
+                udto.setAppUserDor(appUser.getAppUserDor().toLocalDateTime());
+                appUserDTOS.add(udto);
+            }
+        }catch (NullPointerException ex){
+            return null;
         }
         return (HashSet<AppUserDTO>) appUserDTOS;
     }
@@ -102,7 +106,7 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
     public Boolean deleteUser(String appUserUid) {
         log.info("______________________Deleting app user: {} ________________________", appUserUid);
         try {
-            Optional<Long> idOptional = appUserRepository.existsByAppUserUid(appUserUid);
+            Optional<Long> idOptional = appUserRepository.existsByAppUserUidReturnsId(appUserUid);
             if (idOptional.isPresent()) {
                 appUserRepository.deleteById(idOptional.get());
                 return true;
@@ -143,7 +147,7 @@ public class AppUserServiceImpl implements UserService, UserDetailsService {
 
         //Copy properties into the DTO
         BeanUtils.copyProperties(appUser, udto);
-        ServletUriComponentsBuilder.fromCurrentContextPath().path("/app_user/image/" + udto.getAppUserPassportPhoto());
+        //ServletUriComponentsBuilder.fromCurrentContextPath().path("/app_user/image/" + udto.getAppUserPassportPhoto());
         return udto;
     }
 

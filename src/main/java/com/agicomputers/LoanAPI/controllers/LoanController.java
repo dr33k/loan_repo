@@ -1,12 +1,15 @@
 package com.agicomputers.LoanAPI.controllers;
 
 
+import com.agicomputers.LoanAPI.models.dto.AppUserDTO;
 import com.agicomputers.LoanAPI.models.dto.LoanDTO;
+import com.agicomputers.LoanAPI.models.entities.AppUser;
 import com.agicomputers.LoanAPI.models.request.LoanRequest;
 import com.agicomputers.LoanAPI.models.response.AppUserResponse;
 import com.agicomputers.LoanAPI.models.response.Response;
 import com.agicomputers.LoanAPI.security.AppUserAuthentication;
 import com.agicomputers.LoanAPI.services.loan_services.LoanService;
+import com.agicomputers.LoanAPI.services.user_services.AppUserServiceImpl;
 import com.agicomputers.LoanAPI.services.user_services.AppUserValidatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +29,7 @@ import java.util.Set;
 public class LoanController {
     private final LoanService loanService;
     private final AppUserAuthentication authentication;
+    private final AppUserServiceImpl appUserService;
     private final AppUserValidatorService appUserValidatorService;
 
     @GetMapping
@@ -127,6 +131,8 @@ public class LoanController {
         LoanDTO ldto = new LoanDTO();
         BeanUtils.copyProperties(request, ldto);
 
+        AppUser appUser = (AppUser)authentication.getInstance().getPrincipal();
+            ldto.setAppUser((appUser!=null)?appUser:null);
             ldto = loanService.createLoan(ldto);
 
             //Return ResponseEntity

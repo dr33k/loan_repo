@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 public class LoanDTO implements DTO{
     private AppUser appUser;
     private String loanCode;
-    private Float loanPrincipal;
     private Float loanInterestRatePerMonth;
     private Integer loanPeriodMonths;
     private Float loanAmount;

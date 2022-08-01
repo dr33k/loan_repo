@@ -25,7 +25,8 @@ public class RoleService {
     public HashSet<RoleDTO> getAllRoles() {
         log.info("______________________Getting all roles_______________________");
         Set<RoleDTO> roles = new HashSet<RoleDTO>(0);
-        Iterable<Role> rolesFromRepo = roleRepository.findAll(PageRequest.of(0, 10));
+        try {
+            Iterable<Role> rolesFromRepo = roleRepository.findAll(PageRequest.of(0, 10));
 
         RoleDTO rdto;
         Iterator<Role> iterator = rolesFromRepo.iterator();
@@ -34,6 +35,7 @@ public class RoleService {
             BeanUtils.copyProperties(iterator.next(), rdto);
             roles.add(rdto);
         }
+        }catch (NullPointerException ex){return null;}
         return (HashSet<RoleDTO>) roles;
     }
 
@@ -41,7 +43,9 @@ public class RoleService {
 
         RoleDTO rdto = new RoleDTO();
         Optional<Role> roleOptional = roleRepository.findByRoleName(roleName);
-        BeanUtils.copyProperties(roleOptional.orElse(null), rdto);
+        Role role = roleOptional.orElse(null);
+        if (role==null) return null;
+        BeanUtils.copyProperties(role, rdto);
 
         return rdto;
     }

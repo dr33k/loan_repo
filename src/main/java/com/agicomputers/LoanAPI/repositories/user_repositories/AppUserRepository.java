@@ -18,17 +18,32 @@ public interface AppUserRepository extends JpaRepository<AppUser,Long> {
     @Query(value = "SELECT nextval('app_user_generator')",nativeQuery = true)
     Long findNextAppUserId();
 
-    @Query(value="SELECT AU.appUserId FROM AppUser AU WHERE AU.appUserNIN = ?1")
-    Optional<Long> existsByNin(String nin);
+    @Query(value="SELECT " +
+            "CASE WHEN COUNT(AU) > 0 " +
+            "THEN TRUE " +
+            "ELSE FALSE " +
+            "END " +
+            "FROM AppUser AU WHERE AU.appUserNIN = ?1")
+    Boolean existsByNin(String nin);
 
     
-    @Query(value="SELECT AU.appUserId FROM AppUser AU WHERE AU.appUserBVN = ?1")
-    Optional<Long> existsByBvn(String bvn);
+    @Query(value="SELECT " +
+            "CASE WHEN COUNT(AU) > 0 " +
+            "THEN TRUE " +
+            "ELSE FALSE " +
+            "END " +
+            "FROM AppUser AU WHERE AU.appUserBVN = ?1")
+    Boolean existsByBvn(String bvn);
     
-    @Query(value="SELECT AU.appUserId FROM AppUser AU WHERE AU.appUserEmail = ?1")
-    Optional<Long> existsByEmail(String email);
+    @Query(value="SELECT " +
+            "CASE WHEN COUNT(AU) > 0 " +
+            "THEN TRUE " +
+            "ELSE FALSE " +
+            "END " +
+            "FROM AppUser AU WHERE AU.appUserEmail = ?1")
+    Boolean existsByEmail(String email);
 
     @Query(value = "SELECT AU.appUserId FROM AppUser AU WHERE AU.appUserUid = ?1")
-    Optional<Long> existsByAppUserUid(String appUserUid);
+    Optional<Long> existsByAppUserUidReturnsId(String appUserUid);
 
 }

@@ -275,18 +275,18 @@ public class AppUserValidatorService{
 
 
     private Boolean emailExists(String email) {
-        Optional<Long> idWithEmail = appUserRepository.existsByEmail(email);   //Id gotten with the email as a search key
-        return idWithEmail.isPresent();
+        Boolean emailExists = appUserRepository.existsByEmail(email);   //Id gotten with the email as a search key
+        return emailExists;
     }
 
     private Boolean ninExists(String nin) {
-        Optional<Long> idWithNin = appUserRepository.existsByNin(nin);     //Id gotten with the NIN as a search key
-        return idWithNin.isPresent();
+        Boolean ninExists= appUserRepository.existsByNin(nin);     //Id gotten with the NIN as a search key
+        return ninExists;
     }
 
     private boolean bvnExists(String bvn) {
-        Optional<Long> idWithBvn = appUserRepository.existsByBvn(bvn);     //Id gotten with the BVN as a search key
-        return idWithBvn.isPresent();
+        Boolean bvnExists = appUserRepository.existsByBvn(bvn);     //Id gotten with the BVN as a search key
+        return bvnExists;
     }
 
 

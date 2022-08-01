@@ -1,9 +1,6 @@
 package com.agicomputers.LoanAPI.config.flyway;
 
-import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
-import org.hibernate.cfg.Environment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +19,7 @@ public class FlywayConf implements FlywayConfigurationCustomizer {
                 .licenseKey(licenseKey)
                 .baselineOnMigrate(true)
                 .validateMigrationNaming(true)
+
 
                 ;
     }

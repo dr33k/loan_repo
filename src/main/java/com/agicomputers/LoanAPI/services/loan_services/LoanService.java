@@ -89,7 +89,7 @@ public class LoanService {
         loan.setLoanInterestRatePerMonth(ratePerMonth);
 
         //Calculate total loan amount
-        float loanAmount = calculateLoanAmount(ratePerMonth,ldto.getLoanPrincipal(),ldto.getLoanPeriodMonths());
+        float loanAmount = calculateLoanAmount(ratePerMonth,ldto.getLoanAmount(),ldto.getLoanPeriodMonths());
         loan.setLoanAmount(loanAmount);
 
         //Save record

@@ -19,17 +19,22 @@ public class Role {
     @Column(nullable = false)
     private String roleName;
 
-    @Column(nullable = false)
+    @Column
     private String roleAuthorities;
 
     @Transient
-    private String[] roleAuthoritiesArray;
+    private String[] roleAuthoritiesArray = {};
 
 
     @Column(nullable = false)
     private String roleDescription;
 
-   public String[] getRoleAuthoritiesArray() {
+
+    public String[] getRoleAuthoritiesArray() {
+        return (this.roleAuthoritiesArray.length==0)? populateRoleAuthoritiesArray():this.roleAuthoritiesArray;
+   }
+
+   private String[] populateRoleAuthoritiesArray(){
        //Arrays in the Database are in the format
        //"{"foo","bar"}"
 
@@ -60,4 +65,10 @@ public class Role {
        this.roleAuthorities = auths;
    }
 
+    public Role(String roleName, String[] roleAuthoritiesArray, String roleDescription) {
+        this.roleId = roleId;
+        this.roleName = roleName;
+        this.roleAuthoritiesArray = roleAuthoritiesArray;
+        this.roleDescription = roleDescription;
+    }
 }

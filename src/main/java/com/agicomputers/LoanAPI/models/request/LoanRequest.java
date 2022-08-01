@@ -28,7 +28,7 @@ public class LoanRequest {
 
     @Max(value = 1500000L,message = "Unfortunately, that's more than we can handle, try a lower amount please")
     @Min(value = 0L,message = "That's too little")
-    private Float loanPrincipal;
+    private Float loanAmount;
 
     @Max(value=18,message="Maximum amount of time exceeded")
     @Min(value=0,message = "Maximum amount of time exceeded")
